@@ -1,4 +1,6 @@
 require_relative 'xml_parser'
+require "cgi"
+require "pry"
 
 class ArtistsParser
 
@@ -10,7 +12,7 @@ class ArtistsParser
         current = {}
         inside_element do
           for_element 'id' do current[:id] = inner_xml end
-          for_element 'name' do current[:name] = inner_xml end
+          for_element 'name' do current[:name] = fix_name(inner_xml) end
           inside_element 'namevariations' do end
           inside_element 'members' do end
           inside_element 'aliases' do end
@@ -26,4 +28,19 @@ class ArtistsParser
       end
     end
   end
+
+  def self.fix_name(name)
+    number = remove_number!(name)
+    reversed = name.split(",").reverse.reduce("") { |mem,string| mem + " " + string.strip }.strip
+    fixed_name = CGI.unescape_html(reversed)
+    fixed_name << " #{number}" if number
+    fixed_name
+  end
+
+  def self.remove_number!(name)
+    number = name.scan(/\(\d+\)/).first
+    name.gsub!(/\(\d+\)/, "") if number #remove number and add it to the end later
+    number
+  end
 end
+
