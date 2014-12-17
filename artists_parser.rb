@@ -7,12 +7,16 @@ class ArtistsParser
   KNOWN_TAGS = %w(id name namevariations members aliases images #text realname data_quality profile urls groups)
 
   def self.parse(file, &block)
+    self.new.parse(file, &block)
+  end
+
+  def parse(file, &block)
     Xml::Parser.new(file) do
       for_element 'artist' do
         current = {}
         inside_element do
           for_element 'id' do current[:id] = inner_xml end
-          for_element 'name' do current[:name] = fix_name(inner_xml) end
+          for_element 'name' do current[:name] = ArtistsParser.fix_name(inner_xml) end
           inside_element 'namevariations' do end
           inside_element 'members' do end
           inside_element 'aliases' do end
