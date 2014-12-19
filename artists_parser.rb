@@ -1,48 +1,60 @@
 require_relative 'xml_parser'
 require "cgi"
-require "pry"
 
-class ArtistsParser
-
-  KNOWN_TAGS = %w(id name namevariations members aliases images #text realname data_quality profile urls groups)
+class ArtistsParser < Xml::Parser
 
   def self.parse(file, &block)
     self.new.parse(file, &block)
   end
 
+  def initialize
+    @time_start = Time.now
+    @parsed = 0
+    @artist_id, @artist_name= nil
+  end
+
   def parse(file, &block)
-    Xml::Parser.new(file) do
-      for_element 'artist' do
-        current = {}
-        inside_element do
-          for_element 'id' do current[:id] = inner_xml end
-          for_element 'name' do current[:name] = ArtistsParser.fix_name(inner_xml) end
-          inside_element 'namevariations' do end
-          inside_element 'members' do end
-          inside_element 'aliases' do end
-          inside_element 'images' do end
-          inside_element 'realname' do end
-          inside_element 'data_quality' do end
-          inside_element 'profile' do end
-          inside_element 'urls' do end
-          inside_element 'groups' do end
-          raise "Don't know what to do with node=#{name} current=#{current}" unless KNOWN_TAGS.include?(name)
+    begin
+      @node = Nokogiri::XML::Reader.from_io(File.new(file))
+      @node.each do
+        if is_start? && @node.name == "artist"
+          handle_artist_node
+          yield @artist_id, @artist_name
+          @artist_id, @artist_name = nil
+          @parsed += 1
         end
-        yield current
+      end
+    rescue Interrupt
+      time_end = Time.now
+      diff_time = time_end - @time_start
+      puts "Speed=#{@parsed / diff_time.to_f}"
+    end
+  end
+
+  def handle_artist_node
+    @node.each do
+      if is_start? && @node.name == "name"
+        @artist_name = fix_name(@node.inner_xml)
+      elsif is_start? && @node.name == "id"
+        @artist_id = @node.inner_xml
+      elsif is_end? && @node.name == "artist"
+        break
+      else
+        ignore_node
       end
     end
   end
 
-  def self.fix_name(name)
+  def fix_name(name)
     number = remove_number!(name)
-    reversed = name.split(",").reverse.reduce("") { |mem,string| mem + " " + string.strip }.strip
+    reversed = name.split(",").reverse!.reduce("") { |mem,string| mem + " " + string.strip }.strip
     fixed_name = CGI.unescape_html(reversed)
     fixed_name << " #{number}" if number
     fixed_name
   end
 
-  def self.remove_number!(name)
-    number = name.scan(/\(\d+\)/).first
+  def remove_number!(name)
+    number = name.scan(/\(\d+\)/).last
     name.gsub!(/\(\d+\)/, "") if number #remove number and add it to the end later
     number
   end
