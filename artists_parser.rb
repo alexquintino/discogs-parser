@@ -11,6 +11,8 @@ class ArtistsParser < Xml::Parser
     @time_start = Time.now
     @parsed = 0
     @artist_id, @artist_name= nil
+    @parsed_list = ""
+    @parsed_list_size = 0
   end
 
   def parse(file, &block)
@@ -19,11 +21,10 @@ class ArtistsParser < Xml::Parser
       @node.each do
         if is_start? && @node.name == "artist"
           handle_artist_node
-          yield @artist_id, @artist_name
-          @artist_id, @artist_name = nil
-          @parsed += 1
+          parsed(block)
         end
       end
+      block.call @parsed_list
     rescue Interrupt
       time_end = Time.now
       diff_time = time_end - @time_start
@@ -44,6 +45,19 @@ class ArtistsParser < Xml::Parser
       end
     end
   end
+
+  def parsed(block)
+    @parsed_list << "#{@artist_id}\t#{@artist_name}\n"
+    @artist_id, @artist_name = nil
+    @parsed += 1
+    @parsed_list_size += 1
+    if @parsed_list_size == 500000
+      block.call @parsed_list
+      @parsed_list = ""
+      @parsed_list_size = 0
+    end
+  end
+
 
   def fix_name(name)
     number = remove_number!(name)

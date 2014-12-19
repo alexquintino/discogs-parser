@@ -9,9 +9,9 @@ trap :INT do
   Thread.main.raise Interrupt
 end
 
-CSV.open(CSV_FILE, 'wb', {col_sep: "\t", encoding: "UTF-8"}) do |csv|
-  csv << CSV_HEADERS
-  ArtistsParser.parse(FILE) do |id, name|
-    csv << [id, name]
+File.open(CSV_FILE, 'wb') do |csv|
+  csv.puts CSV_HEADERS.join("\t")
+  ArtistsParser.parse(FILE) do |artists|
+    csv.write(artists)
   end
 end
