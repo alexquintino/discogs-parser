@@ -1,30 +1,7 @@
-require_relative 'xml_parser'
 require "cgi"
+require "nokogiri"
 
-class ArtistsParser < Xml::Parser
-
-  def self.parse(file, &block)
-    self.new.parse(file, &block)
-  end
-
-  def initialize
-    @time_start = Time.now
-  end
-
-  def parse(file, &block)
-    begin
-      document = ArtistDocument.new(block)
-      parser = Nokogiri::XML::SAX::Parser.new(document)
-      parser.parse_file(file)
-    rescue Interrupt
-      time_end = Time.now
-      diff_time = time_end - @time_start
-      puts "Speed=#{document.how_many_parsed / diff_time.to_f}"
-    end
-  end
-end
-
-class ArtistDocument < Nokogiri::XML::SAX::Document
+class ArtistsDocument < Nokogiri::XML::SAX::Document
 
   def initialize(block = nil)
     @block = block

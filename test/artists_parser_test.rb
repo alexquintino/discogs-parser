@@ -1,4 +1,5 @@
-require_relative "../artists_parser"
+require_relative "../artists_document"
+require_relative "../parser"
 require "minitest/autorun"
 require "pry"
 
@@ -7,7 +8,7 @@ class ArtistsParserTest < MiniTest::Unit::TestCase
   def test_parse
     file = "test/test_xml.xml"
     result = []
-    ArtistsParser.parse(file) do |artist_string|
+    Parser.parse(ArtistsDocument, file) do |artist_string|
       result = artist_string.chomp.split("\t")
     end
     assert_equal "3", result[0]
@@ -15,14 +16,14 @@ class ArtistsParserTest < MiniTest::Unit::TestCase
   end
 
   def test_returns_the_name_correctly_if_theres_nothing_to_be_done
-    assert_equal "Bla", ArtistDocument.new.fix_name("Bla")
+    assert_equal "Bla", ArtistsDocument.new.fix_name("Bla")
   end
 
   def test_reverses_the_name_correctly
-    assert_equal "Cenas Bla", ArtistDocument.new.fix_name("Bla, Cenas")
+    assert_equal "Cenas Bla", ArtistsDocument.new.fix_name("Bla, Cenas")
   end
 
   def test_moves_the_number_correctly
-    assert_equal "Cenas Bla (6)", ArtistDocument.new.fix_name("Bla, Cenas (6)")
+    assert_equal "Cenas Bla (6)", ArtistsDocument.new.fix_name("Bla, Cenas (6)")
   end
 end
