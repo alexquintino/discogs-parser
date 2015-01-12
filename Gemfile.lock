@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    benchmark-ips (2.1.0)
     coderay (1.1.0)
     ffi (1.9.6-java)
     method_source (0.8.2)
@@ -26,5 +27,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark-ips
   nokogiri
   pry
