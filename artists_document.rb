@@ -1,49 +1,41 @@
 require "cgi"
 require "nokogiri"
+require_relative "document"
 
-class ArtistsDocument < Nokogiri::XML::SAX::Document
-
-  def initialize(block = nil)
-    @block = block
-    @state = []
-    @parsed_count = 0
-    @artist_id, @artist_name= nil
-    @parsed_list = ""
-    @parsed_list_size = 0
-  end
+class ArtistsDocument < Document
 
   def start_element(name, attrs = [])
     case name
     when "artist"
-      @state.push(:artist)
+      push :artist
     when "name"
-      @state.push(:name) if @state.last == :artist
+      push :name if peek == :artist
     when "id"
-      @state.push(:id)
+      push :id
     else
-      @state.push(:unknown) if @state.last == :artist
+      push :unknown if peek == :artist
     end
   end
 
   def end_element(name, attrs = [])
     case name
     when "artist"
-      parsed(@block, @artist_id, @artist_name)
+      parsed(@artist_id, @artist_name)
       @artist_id, @artist_name = nil
       @state.clear
     when "name"
-      @state.pop if @state.last == :name
+      pop if peek == :name
     when "id"
-      @state.pop if @state.last == :id
+      pop if peek == :id
     else
-      @state.pop if @state.last == :unknown
+      pop if peek == :unknown
     end
   end
 
   def characters(string)
-    if @state.last == :id
+    if peek == :id
       @artist_id = string
-    elsif @state.last == :name
+    elsif peek == :name
       @artist_name = fix_name(string)
     end
   end
@@ -52,19 +44,9 @@ class ArtistsDocument < Nokogiri::XML::SAX::Document
     flush
   end
 
-  def flush
-    @block.call @parsed_list
-    @parsed_list = ""
-    @parsed_list_size = 0
-  end
 
-  def parsed(block, artist_id, artist_name)
-    @parsed_list << "#{artist_id}\t#{artist_name}\n"
-    @parsed_count += 1
-    @parsed_list_size += 1
-    if @parsed_list_size == 500000
-      flush
-    end
+  def parsed(artist_id, artist_name)
+    super "#{artist_id}\t#{artist_name}\n"
   end
 
   def fix_name(name)
@@ -74,6 +56,7 @@ class ArtistsDocument < Nokogiri::XML::SAX::Document
     fixed_name << " #{number}" if number
     fixed_name
   end
+
 
   def remove_number!(name)
     number = name.scan(/\(\d+\)/).last

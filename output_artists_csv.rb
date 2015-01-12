@@ -1,4 +1,5 @@
-require_relative 'artists_parser'
+require_relative 'parser'
+require_relative 'artists_document'
 require 'csv'
 
 FILE = "data/discogs_20141001_artists.xml"
@@ -11,7 +12,7 @@ end
 
 File.open(CSV_FILE, 'wb') do |csv|
   csv.puts CSV_HEADERS.join("\t")
-  ArtistsParser.parse(FILE) do |artists|
+  Parser.parse(ArtistsDocument, FILE) do |artists|
     csv.write(artists)
   end
 end
