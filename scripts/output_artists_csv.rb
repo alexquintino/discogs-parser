@@ -1,5 +1,5 @@
-require_relative 'parser'
-require_relative 'artists_document'
+require_relative '../lib/parser'
+require_relative '../lib/artists_document'
 require 'csv'
 
 FILE = "data/discogs_20141001_artists.xml"

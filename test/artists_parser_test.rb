@@ -1,12 +1,12 @@
-require_relative "../artists_document"
-require_relative "../parser"
+require_relative "../lib/artists_document"
+require_relative "../lib/parser"
 require "minitest/autorun"
 require "pry"
 
 class ArtistsParserTest < MiniTest::Unit::TestCase
 
   def test_parse
-    file = "test/test_xml.xml"
+    file = "test/artists_sample.xml"
     result = []
     Parser.parse(ArtistsDocument, file) do |artist_string|
       result = artist_string.chomp.split("\t")
