@@ -1,1 +1,3 @@
-data
+data/*.xml
+data/*.gz
+output/*.csv
