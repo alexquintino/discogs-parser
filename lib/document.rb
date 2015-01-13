@@ -2,27 +2,15 @@ require "nokogiri"
 
 class Document < Nokogiri::XML::SAX::Document
 
-  def initialize(block = nil)
-    @block = block
+  def initialize(outputter = nil)
+    @outputter = outputter
     @state = []
-    @parsed_count = 0
-    @parsed_list = ""
-    @parsed_list_size = 0
+    @parsed_count = 0;
   end
 
-  def flush
-    @block.call @parsed_list
-    @parsed_list = ""
-    @parsed_list_size = 0
-  end
-
-  def parsed(string)
-    @parsed_list << string
+  def parsed(fields)
+    @outputter.write(fields)
     @parsed_count += 1
-    @parsed_list_size += 1
-    if @parsed_list_size == 500000
-      flush
-    end
   end
 
   def push(state)
@@ -35,5 +23,13 @@ class Document < Nokogiri::XML::SAX::Document
 
   def peek
     @state.last
+  end
+
+  def end_document
+    @outputter.finalize
+  end
+
+  def how_many_parsed
+    @parsed_count
   end
 end

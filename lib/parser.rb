@@ -1,21 +1,24 @@
 require "nokogiri"
+require_relative "csv_outputter"
 
 class Parser
-  def initialize(document, file)
+
+  def initialize(document, data, outputter)
     @time_start = Time.now
     @document = document
-    @file = file
+    @data = data
+    @outputter = outputter
   end
 
-  def self.parse(document, file, &block)
-    self.new(document, file).parse(&block)
+  def self.parse(document, data, outputter)
+    self.new(document, data, outputter).parse
   end
 
-  def parse(&block)
+  def parse
     begin
-      document = @document.new(block)
+      document = @document.new(@outputter)
       parser = Nokogiri::XML::SAX::Parser.new(document)
-      parser.parse_file(@file)
+      parser.parse_file(@data)
     rescue Interrupt
       time_end = Time.now
       diff_time = time_end - @time_start
