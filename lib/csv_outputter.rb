@@ -9,7 +9,7 @@ class CSVOutputter
   end
 
   def write(fields)
-    @file.write field.join(COL_SEPARATOR) + "\n"
+    @file.write fields.join(COL_SEPARATOR) + "\n"
   end
 
   def finalize

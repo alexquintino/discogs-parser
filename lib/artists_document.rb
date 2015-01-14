@@ -36,23 +36,24 @@ class ArtistsDocument < Document
     if peek == :id
       @artist_id = string
     elsif peek == :name
-      @artist_name = fix_name(string)
+      @artist_name = string
     end
   end
 
-  def fix_name(name)
-    number = remove_number!(name)
-    reversed = name.split(",").reverse!.reduce("") { |mem,string| mem + " " + string.strip }.strip
-    fixed_name = CGI.unescape_html(reversed)
-    fixed_name << " #{number}" if number
-    fixed_name
-  end
+  # removing this temporarily
+  # def fix_name(name)
+  #   number = remove_number!(name)
+  #   reversed = name.split(",").reverse!.reduce("") { |mem,string| mem + " " + string.strip }.strip
+  #   fixed_name = CGI.unescape_html(reversed)
+  #   fixed_name << " #{number}" if number
+  #   fixed_name
+  # end
 
 
-  def remove_number!(name)
-    number = name.scan(/\(\d+\)/).last
-    name.gsub!(/\(\d+\)/, "") if number #remove number and add it to the end later
-    number
-  end
+  # def remove_number!(name)
+  #   number = name.scan(/\(\d+\)/).last
+  #   name.gsub!(/\(\d+\)/, "") if number #remove number and add it to the end later
+  #   number
+  # end
 end
 
