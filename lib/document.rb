@@ -32,4 +32,22 @@ class Document < Nokogiri::XML::SAX::Document
   def how_many_parsed
     @parsed_count
   end
+
+  def skip_tag(tag)
+    push :unknown
+    @unknown_tag = tag
+  end
+
+  def skipping?
+    peek == :unknown
+  end
+
+  def end_skip?(tag)
+    if skipping? && tag == @unknown_tag
+      pop
+      @unknown_tag = nil
+      return true
+    end
+  end
+
 end

@@ -5,7 +5,10 @@ require_relative "document"
 class ArtistsDocument < Document
 
   def start_element(name, attrs = [])
+    return if skipping?
     case name
+    when "artists"
+      push :artists
     when "artist"
       push :artist
     when "name"
@@ -13,11 +16,12 @@ class ArtistsDocument < Document
     when "id"
       push :id
     else
-      push :unknown if peek == :artist
+      skip_tag name
     end
   end
 
   def end_element(name, attrs = [])
+    return if end_skip?(name)
     case name
     when "artist"
       parsed([@artist_id, @artist_name])
@@ -27,8 +31,8 @@ class ArtistsDocument < Document
       pop if peek == :name
     when "id"
       pop if peek == :id
-    else
-      pop if peek == :unknown
+    when "artists"
+      pop if peek == :artists
     end
   end
 
