@@ -4,17 +4,12 @@ require_relative "document"
 
 class ArtistsDocument < Document
 
+  IMPORTANT_TAGS = %w(artists artist id name)
+
   def start_element(name, attrs = [])
     return if skipping?
-    case name
-    when "artists"
-      push :artists
-    when "artist"
-      push :artist
-    when "name"
-      push :name if peek == :artist
-    when "id"
-      push :id
+    if IMPORTANT_TAGS.include?(name)
+      push name
     else
       skip_tag name
     end
@@ -22,24 +17,19 @@ class ArtistsDocument < Document
 
   def end_element(name, attrs = [])
     return if end_skip?(name)
-    case name
-    when "artist"
+    if name == "artist"
       parsed([@artist_id, @artist_name])
       @artist_id, @artist_name = nil
       @state.clear
-    when "name"
-      pop if peek == :name
-    when "id"
-      pop if peek == :id
-    when "artists"
-      pop if peek == :artists
+    else
+      pop
     end
   end
 
   def characters(string)
-    if peek == :id
+    if peek == "id"
       @artist_id = string
-    elsif peek == :name
+    elsif peek == "name"
       @artist_name = string
     end
   end

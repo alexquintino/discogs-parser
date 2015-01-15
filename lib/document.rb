@@ -43,9 +43,11 @@ class Document < Nokogiri::XML::SAX::Document
   end
 
   def end_skip?(tag)
-    if skipping? && tag == @unknown_tag
-      pop
-      @unknown_tag = nil
+    if skipping?
+      if tag == @unknown_tag
+        pop
+        @unknown_tag = nil
+      end
       return true
     end
   end
