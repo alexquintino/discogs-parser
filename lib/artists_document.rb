@@ -32,7 +32,7 @@ class ArtistsDocument < Document
 
   def characters(string)
     if peek == "id"
-      @artist_id = string
+      @artist_id += string
     elsif peek == "name"
       @artist_name += string
     end

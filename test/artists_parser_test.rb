@@ -17,6 +17,9 @@ class ArtistsParserTest < MiniTest::Unit::TestCase
 
     assert_equal "239", outputter.output[1][0]
     assert_equal "Jesper Dahlbäck", outputter.output[1][1]
+
+    assert_equal "22164", outputter.output[3][0]
+    assert_equal "Earth, Wind & Fire", outputter.output[3][1]
   end
 
   # def test_returns_the_name_correctly_if_theres_nothing_to_be_done
