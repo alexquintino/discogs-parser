@@ -5,7 +5,7 @@ class CSVOutputter
   def initialize(path)
     @path = path
     @buffer = []
-    @file = File.open(@path, "wb")
+    @file = File.open(@path, "w")
   end
 
   def write(fields)

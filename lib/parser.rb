@@ -17,7 +17,7 @@ class Parser
   def parse
     begin
       document = @document.new(@outputter)
-      parser = Nokogiri::XML::SAX::Parser.new(document)
+      parser = Nokogiri::XML::SAX::Parser.new(document, 'UTF-8')
       parser.parse_file(@data)
     rescue Interrupt
       time_end = Time.now

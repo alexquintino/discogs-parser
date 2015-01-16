@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require_relative "../lib/artists_document"
 require_relative "../lib/parser"
 require "minitest/autorun"
@@ -10,8 +12,11 @@ class ArtistsParserTest < MiniTest::Unit::TestCase
     outputter = TestOutputter.new
     Parser.parse(ArtistsDocument, data, outputter)
 
-    assert_equal "3", outputter.output.first[0]
-    assert_equal "Josh Wink", outputter.output.first[1]
+    assert_equal "3", outputter.output[0][0]
+    assert_equal "Josh Wink", outputter.output[0][1]
+
+    assert_equal "239", outputter.output[1][0]
+    assert_equal "Jesper Dahlbäck", outputter.output[1][1]
   end
 
   # def test_returns_the_name_correctly_if_theres_nothing_to_be_done
@@ -25,6 +30,11 @@ class ArtistsParserTest < MiniTest::Unit::TestCase
   # def test_moves_the_number_correctly
   #   assert_equal "Cenas Bla (6)", ArtistsDocument.new.fix_name("Bla, Cenas (6)")
   # end
+
+  def test_non_empty?
+    assert ArtistsDocument.new.non_empty?(["aaa", "bbb", "ccc"])
+    refute ArtistsDocument.new.non_empty?(["aaa", "", "ccc"])
+  end
 end
 
 class TestOutputter

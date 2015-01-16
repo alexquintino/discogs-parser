@@ -6,6 +6,10 @@ class ArtistsDocument < Document
 
   IMPORTANT_TAGS = %w(artists artist id name)
 
+  def initialize(*args)
+    super
+    @artist_name, @artist_id = "", ""
+  end
   def start_element(name, attrs = [])
     return if skipping?
     if IMPORTANT_TAGS.include?(name)
@@ -19,7 +23,7 @@ class ArtistsDocument < Document
     return if end_skip?(name)
     if name == "artist"
       parsed([@artist_id, @artist_name])
-      @artist_id, @artist_name = nil
+      @artist_id, @artist_name = "", ""
       @state.clear
     else
       pop
@@ -30,7 +34,7 @@ class ArtistsDocument < Document
     if peek == "id"
       @artist_id = string
     elsif peek == "name"
-      @artist_name = string
+      @artist_name += string
     end
   end
 

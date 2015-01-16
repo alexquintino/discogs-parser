@@ -9,8 +9,14 @@ class Document < Nokogiri::XML::SAX::Document
   end
 
   def parsed(fields)
-    @outputter.write(fields)
-    @parsed_count += 1
+    if non_empty?(fields)
+      @outputter.write(fields)
+      @parsed_count += 1
+    end
+  end
+
+  def non_empty?(fields)
+    fields.map { |field| !field.empty? }.reduce { |a,b| a && b }
   end
 
   def push(state)
