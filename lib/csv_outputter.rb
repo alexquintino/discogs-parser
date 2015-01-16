@@ -5,11 +5,13 @@ class CSVOutputter
   def initialize(path)
     @path = path
     @buffer = []
-    @file = File.open(@path, "w")
+    @file = File.open(@path, "w:UTF-8")
   end
 
   def write(fields)
-    @file.write fields.join(COL_SEPARATOR) + "\n"
+    @file.write fields
+        .map{ |field| field.is_a?(String) ? field : field.join(",")}
+        .join(COL_SEPARATOR) + "\n"
   end
 
   def finalize

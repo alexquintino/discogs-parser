@@ -38,6 +38,12 @@ class ArtistsDocument < Document
     end
   end
 
+  def end_document
+    #manually add artist 194 - Various
+    parsed(["194", "Various"])
+    super
+  end
+
   # removing this temporarily
   # def fix_name(name)
   #   number = remove_number!(name)
