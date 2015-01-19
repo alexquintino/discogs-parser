@@ -2,10 +2,11 @@
 
 require_relative "../lib/artists_document"
 require_relative "../lib/parser"
+require_relative "test_outputter"
 require "minitest/autorun"
 require "pry"
 
-class ArtistsParserTest < MiniTest::Unit::TestCase
+class ArtistsParserTest < MiniTest::Test
 
   def test_parse
     data = "test/artists_sample.xml"
@@ -40,18 +41,4 @@ class ArtistsParserTest < MiniTest::Unit::TestCase
   end
 end
 
-class TestOutputter
 
-  attr_reader :output
-
-  def initialize
-    @output = []
-  end
-
-  def write(array)
-    @output << array
-  end
-
-  def finalize
-  end
-end
