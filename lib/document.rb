@@ -2,16 +2,41 @@ require "nokogiri"
 
 class Document < Nokogiri::XML::SAX::Document
 
+  OUTPUT_MAPPING = {first: 0, second: 1}
+
   def initialize(outputter = nil)
     @outputter = outputter
     @state = []
     @parsed_count = 0;
+    @current_string = ""
   end
 
-  def parsed(fields)
-    if non_empty?(fields)
-      @outputter.write(fields)
+  def parsed(fields, allow_empty = false, outputter = :first)
+    if allow_empty || non_empty?(fields)
+      write(fields, outputter)
       @parsed_count += 1
+    end
+  end
+
+  def write(array, outputter_index)
+    if @outputter.is_a? Array
+      @outputter[OUTPUT_MAPPING[outputter_index]].write(array)
+    elsif outputter_index == :first
+      @outputter.write(array)
+    end
+  end
+
+  def end_document
+    if @outputter.is_a? Array
+      @outputter.each {|o| o.finalize}
+    else
+      @outputter.finalize
+    end
+  end
+
+  def characters(string)
+    if !skipping?
+      @current_string += string
     end
   end
 
@@ -27,13 +52,14 @@ class Document < Nokogiri::XML::SAX::Document
     @state.pop
   end
 
-  def peek
-    @state.last
+  def peek(index = 1)
+    if index == 1
+      @state.last
+    else
+      @state.last(index)
+    end
   end
 
-  def end_document
-    @outputter.finalize
-  end
 
   def how_many_parsed
     @parsed_count
