@@ -3,3 +3,4 @@ data/*.gz
 output/*.csv
 output/*.tsv
 scala/target
+scala/project
