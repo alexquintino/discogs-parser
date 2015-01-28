@@ -4,54 +4,54 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import java.io.FileWriter
+import org.apache.spark.rdd.RDD
 
 object ArtistsWithIds {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("discogs-parser Fav Artists With Ids")
     val sc = new SparkContext(conf)
 
-    val discogs_artists = sc.textFile(args(0))
-    val fav_artists = scala.io.Source.fromFile(args(1)).getLines.toList.map(artist => normalize(artist))
+    // (id, name)
+    val discogs_artists = sc.textFile("output/discogs_artists.csv").cache()
+        .map(_.split("\t"))
+        .map(fixName)
+        .map(artist => (normalize(artist(1)), artist)) // (name_norm, (id, name))
 
-    val found_artists = discogs_artists.map(line => line.split("\t"))
-                  .map(array => Array(array(0), fix_name(array(1))))
-                  .filter(array => fav_artists.contains(normalize(array(1))) )
-                  .collect
+    val fav_artists = sc.textFile(args(0))
+        .map(artist => (normalize(artist), artist)) // (name_norm, name)
 
-    save_to_tsv(found_artists, args(2))
+    // (name_norm, (name, (id, name))
+    val found_artists = fav_artists.join(discogs_artists)
+
+    found_artists.map(map => map._2._2).coalesce(1).map(_.mkString("\t")).saveAsTextFile("output/artists_with_ids")
 
     print_not_found_stats(fav_artists, found_artists)
 
   }
 
-  def save_to_tsv(array: Array[Array[String]], path: String) {
-    val file = new FileWriter(path)
-    array.foreach(element => file.write(element.mkString("\t") + "\n"))
-    file.close
-  }
-
-  def print_not_found_stats(fav_artists: List[String], found_artists: Array[Array[String]]) {
-    val found_artists_names = found_artists.map(fields => normalize(fields(1)))
-    val not_found_artists = fav_artists.filter(artist => !found_artists_names.contains(artist))
-    val percentage = not_found_artists.size.toDouble / fav_artists.size  * 100
-    println(s"Not found: ${not_found_artists.size}. Percentage: $percentage")
-    println(not_found_artists)
+  def print_not_found_stats(fav_artists: RDD[(String,String)], found_artists: RDD[(String,(String, List[String]))]) {
+    val not_found_artists = fav_artists.subtractByKey(found_artists).collect
+    val size = not_found_artists.size.toDouble
+    val percentage = size.toDouble / fav_artists.count  * 100
+    println(s"Not found: ${size}. Percentage: $percentage")
+    not_found_artists.foreach(artist => println(artist._2))
   }
 
   def normalize(string: String): String = {
     string.toLowerCase
   }
 
-  def fix_name(name: String): String = {
+  def fixName(artist: Array[String]): List[String] = {
+    val name = artist(1)
     val (name_without_number, number) = remove_number(name)
     val reversed = name_without_number.split(",").reverse.map(x => x.trim).mkString(" ")
     if (number.isEmpty)
     {
-      return reversed
+      return List(artist(0), reversed)
     }
     else
     {
-      return s"$reversed $number"
+      return List(artist(0), s"$reversed $number")
     }
   }
 
