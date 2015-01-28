@@ -13,14 +13,15 @@ object FilterArtistsAndReleases {
     val logger = Logger.getLogger("spark")
 
     // artist_id / name
-    val artists_ids = scala.io.Source.fromFile("output/artists_with_ids")
-                            .getLines.toSet[String].map(_.split("\t"))
+    val artists_ids = sc.textFile("output/artists_with_ids")
+                            .map(_.split("\t"))
                             .map(artist => artist(0))
+                            .collect.toSet
     val artists_ids_broadcast = sc.broadcast(artists_ids)
 
 
     // release_id / artists / title / remixers - filter out empty tracks
-    val tracks = sc.textFile(args(2)).map(_.split("\t")).filter(_.size > 2).cache()
+    val tracks = sc.textFile("output/discogs_tracks.tsv").map(_.split("\t")).filter(_.size > 2).cache()
 
     // release ids taken from selected tracks - there will be repeated releases
     val releaseIdsFromTracks = grabTracksForArtists(tracks, artists_ids_broadcast.value).map(track => track(0)).distinct.collect.toSet
@@ -29,7 +30,7 @@ object FilterArtistsAndReleases {
     val releaseIdsFromTracksBroadcast = sc.broadcast(releaseIdsFromTracks)
 
     // release_id / master_id / title / main_artists - filter out malformed releases
-    val releases = sc.textFile(args(1)).map(_.split("\t")).filter(_.size == 4).cache()
+    val releases = sc.textFile("output/discogs_releases.tsv").map(_.split("\t")).filter(_.size == 4).cache()
     val selected_releases = releases.filter(release => releaseIdsFromTracksBroadcast.value.contains(release(0)))
 
     // master ids taken from releases
@@ -38,7 +39,7 @@ object FilterArtistsAndReleases {
 
 
     // master_id / main_release / artists
-    val masters = sc.textFile(args(0)).map(_.split("\t"))
+    val masters = sc.textFile("output/discogs_masters.tsv").map(_.split("\t"))
     val selected_masters  = masters.filter(master => masterIdsFromReleases.contains(master(0)))
 
     // main releases extracted from master ids

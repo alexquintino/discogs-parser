@@ -97,11 +97,11 @@ object OutputNodesAndRelationships {
   }
 
   def saveReleasesNodes(releases: RDD[(Array[String], Long)]) {
-    releases.map(release => Array(release._1(0), release._1(2), "Tracklist").mkString("\t")).saveAsTextFile("output/tracklist_nodes")
+    releases.map(release => Array(release._1(0), release._1(2), "Tracklist").mkString("\t")).saveAsTextFile("output/tracklists_nodes")
   }
 
   def saveTracksNodes(tracks: RDD[(Array[String], Long)]) {
-    tracks.map(track => Array(track._1(2), "Track").mkString("\t")).saveAsTextFile("output/track_nodes")
+    tracks.map(track => Array(track._1(2), "Track").mkString("\t")).saveAsTextFile("output/tracks_nodes")
   }
 
   def getArtists(artists: RDD[String]): RDD[(Array[String], Long)] = { artists.map(_.split("\t")).zipWithIndex }
