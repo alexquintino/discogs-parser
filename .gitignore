@@ -1,6 +1,5 @@
 data/discogs*.xml
 data/*.gz
-output/*.csv
-output/*.tsv
+output
 scala/target
 scala/project
