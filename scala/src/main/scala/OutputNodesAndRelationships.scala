@@ -27,14 +27,19 @@ object OutputNodesAndRelationships {
 
 
     // Relationships
-
-    // format: (artist_id, (artist_index, (release_id, release_index)))
     extractArtistsReleasesRelationships(artists, releases)
       .map(_.mkString("\t"))
       .saveAsTextFile("output/artist_release_relationship")
 
+    extractReleasesTracksRelationships(releases, tracks)
+      .map(_.mkString("\t"))
+      .saveAsTextFile("output/tracklist_tracks_relationship")
 
-    // val tracksMap = makeTracksMap(tracks, artistsCount + releasesCount)
+    extractArtistsTracksRelationships(artists, tracks)
+      .map(_.mkString("\t"))
+      .saveAsTextFile("output/artist_tracks_relationship")
+
+
   }
 
 
@@ -45,16 +50,31 @@ object OutputNodesAndRelationships {
               .map(extractArtistReleaseRelationship)
   }
 
+  def extractReleasesTracksRelationships(releases: RDD[(Array[String], Long)], tracks: RDD[(Array[String], Long)]): RDD[List[Any]] = {
+    val releasesMap = releases.map(rel => (rel._1(0), rel._2))
+    val tracksMap = tracks.map(track => (track._1(0), track._2))
+    releasesMap.join(tracksMap)
+                .map(extractReleaseTrackRelationship)
+  }
+
+  def extractArtistsTracksRelationships(artists: RDD[(Array[String], Long)], tracks: RDD[(Array[String], Long)]): RDD[List[Any]] = {
+    val artistsMap = artists.map(artist => (artist._1(0), artist._2))
+    val tracksMap = tracks.map(track => (track._1(1), track._2)).flatMap(splitArtistsInTrack)
+    artistsMap.join(tracksMap)
+              .map(extractArtistTrackRelationship)
+  }
+
   def extractArtistReleaseRelationship(rel: (String, (Long, (String, Long)))): List[Any] = {
     List(rel._2._1, rel._2._2._2, "HAS_TRACKLIST")
   }
 
-  // //return (artist_id, (release_id, release_index))
-  // def makeReleasesMap(releases: RDD[Array[String]], artistsCount: Long): RDD[(String, (String, Long))] = {
-  //   releases.map(release => (release(0), release(3))).zipWithIndex()
-  //     .map(rel => (rel._1, rel._2 + artistsCount)) //adjust releases index with artists count
-  //     .flatMap(restructureRelease)
-  // }
+  def extractReleaseTrackRelationship(rel: (String, (Long, Long))): List[Any] = {
+    List(rel._2._1, rel._2._2, "HAS_TRACK")
+  }
+
+  def extractArtistTrackRelationship(rel: (String, (Long, Long))): List[Any] = {
+    List(rel._2._1, rel._2._2, "HAS_TRACK")
+  }
 
   def restructureRelease(release: ((String, String), Long)): Array[(String, (String, Long))] = {
     val artists = release._1._2
@@ -63,11 +83,14 @@ object OutputNodesAndRelationships {
     }
   }
 
-  // def joinReleasesTracks(releases: RDD[Array[String], tracks: RDD[Array[String]]])
+  def splitArtistsInTrack(track: (String, Long)): Array[(String, Long)] = {
+    val artists = track._1
+    artists.split(",").map {
+      artist => (artist, track._2)
+    }
+  }
 
-  // def makeTracksMap(tracks: RDD[Array[String]], artistsPlusReleasesCount: Long): RDD[(String, Long)] = {
-  //   tracks.map(track => track(0)).zipWithIndex().map(track => (track._1, track._2 + artistsPlusReleasesCount))
-  // }
+
 
   def savaArtistsNodes(artists: RDD[(Array[String], Long)]) {
     artists.map(artist => artist._1 ++ Array("Artist")).map(_.mkString("\t")).saveAsTextFile("output/artists_nodes")
