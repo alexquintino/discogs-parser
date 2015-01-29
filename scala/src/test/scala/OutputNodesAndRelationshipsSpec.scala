@@ -14,14 +14,14 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
         val sc = setupContext()
         try {
           val artistsRDD = OutputNodesAndRelationships.getArtists(sc.makeRDD(artists))
-          val releasesRDD = OutputNodesAndRelationships.getReleases(sc.makeRDD(releases), artists.size)
+          val releasesRDD = OutputNodesAndRelationships.getReleases(sc.makeRDD(releases), artistsLastIndex)
           val result = OutputNodesAndRelationships.extractArtistsReleasesRelationships(artistsRDD, releasesRDD).collect
 
           assert(4 == result.size)
-          assert(result.contains(List("art3", "92", "HAS_TRACKLIST")))
-          assert(result.contains(List("art8", "7", "HAS_TRACKLIST")))
-          assert(result.contains(List("art8", "92", "HAS_TRACKLIST")))
-          assert(result.contains(List("art5", "5", "HAS_TRACKLIST")))
+          assert(result.contains(List("art3", "97", "HAS_TRACKLIST")))
+          assert(result.contains(List("art8", "12", "HAS_TRACKLIST")))
+          assert(result.contains(List("art8", "97", "HAS_TRACKLIST")))
+          assert(result.contains(List("art5", "10", "HAS_TRACKLIST")))
 
           } finally {
             sc.stop
@@ -33,16 +33,16 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
       it("joins the releases with the tracks and extracts the relationships") {
         val sc = setupContext()
         try {
-          val releasesRDD = OutputNodesAndRelationships.getReleases(sc.makeRDD(releases), artists.size)
-          val tracksRDD = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releases.size, artists.size)
+          val releasesRDD = OutputNodesAndRelationships.getReleases(sc.makeRDD(releases), artistsLastIndex)
+          val tracksRDD = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releasesLastIndex)
           val result = OutputNodesAndRelationships.extractReleasesTracksRelationships(releasesRDD, tracksRDD).collect
 
           assert(5 == result.size)
-          assert(result.contains(List("7", 8, "HAS_TRACK")))
-          assert(result.contains(List("103", 9, "HAS_TRACK")))
-          assert(result.contains(List("5", 10, "HAS_TRACK")))
-          assert(result.contains(List("5", 11, "HAS_TRACK")))
-          assert(result.contains(List("92", 12, "HAS_TRACK")))
+          assert(result.contains(List("12", "109", "HAS_TRACK")))
+          assert(result.contains(List("108", "110", "HAS_TRACK")))
+          assert(result.contains(List("10", "111", "HAS_TRACK")))
+          assert(result.contains(List("10", "112", "HAS_TRACK")))
+          assert(result.contains(List("97", "113", "HAS_TRACK")))
 
         } finally {
           sc.stop
@@ -55,17 +55,17 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
         val sc = setupContext()
         try {
           val artistsRDD = OutputNodesAndRelationships.getArtists(sc.makeRDD(artists))
-          val tracksRDD = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releases.size, artists.size)
+          val tracksRDD = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releasesLastIndex)
 
           val result = OutputNodesAndRelationships.extractArtistsTracksRelationships(artistsRDD, tracksRDD).collect
           assert(7 == result.size)
-          assert(result.contains(List("art3", 10, "HAS_TRACK")))
-          assert(result.contains(List("art3", 12, "HAS_TRACK")))
-          assert(result.contains(List("art5", 9, "HAS_TRACK")))
-          assert(result.contains(List("art8", 8, "HAS_TRACK")))
-          assert(result.contains(List("art9", 9, "HAS_TRACK")))
-          assert(result.contains(List("art9", 11, "HAS_TRACK")))
-          assert(result.contains(List("art9", 12, "HAS_TRACK")))
+          assert(result.contains(List("art3", "111", "HAS_TRACK")))
+          assert(result.contains(List("art3", "113", "HAS_TRACK")))
+          assert(result.contains(List("art5", "110", "HAS_TRACK")))
+          assert(result.contains(List("art8", "109", "HAS_TRACK")))
+          assert(result.contains(List("art9", "110", "HAS_TRACK")))
+          assert(result.contains(List("art9", "112", "HAS_TRACK")))
+          assert(result.contains(List("art9", "113", "HAS_TRACK")))
         } finally {
           sc.stop
         }
@@ -107,11 +107,11 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
       it("returns the releases with index") {
         val sc = setupContext()
         try {
-          val result = OutputNodesAndRelationships.getReleases(sc.makeRDD(releases()), artists.size).collect
-          assert(Array("5", "1", "masterRel", "title", "art5").deep == result(0).deep)
-          assert(Array("7", "3", "masterRel", "title", "art8").deep == result(1).deep)
-          assert(Array("92", "88", "masterRel", "title", "art3,art8").deep == result(2).deep)
-          assert(Array("103", "99", "masterRel", "title", "art4").deep == result(3).deep)
+          val result = OutputNodesAndRelationships.getReleases(sc.makeRDD(releases()), artistsLastIndex).collect
+          assert(Array("10", "1", "masterRel", "title", "art5").deep == result(0).deep)
+          assert(Array("12", "3", "masterRel", "title", "art8").deep == result(1).deep)
+          assert(Array("97", "88", "masterRel", "title", "art3,art8").deep == result(2).deep)
+          assert(Array("108", "99", "masterRel", "title", "art4").deep == result(3).deep)
         } finally {
           sc.stop
         }
@@ -122,12 +122,12 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
       it("returns the tracks with index") {
         val sc = setupContext()
         try {
-          val result = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), artists.size, releases.size).collect
-          assert((Array("3", "art8", "title1").deep, 8) == (result(0)._1.deep, result(0)._2))
-          assert((Array("99", "art5,art9", "title2").deep, 9) == (result(1)._1.deep, result(1)._2))
-          assert((Array("1", "art3", "title3").deep, 10) == (result(2)._1.deep, result(2)._2))
-          assert((Array("1", "art9", "title4").deep, 11) == (result(3)._1.deep, result(3)._2))
-          assert((Array("88", "art9,art3", "title5").deep, 12) == (result(4)._1.deep, result(4)._2))
+          val result = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releasesLastIndex).collect
+          assert(Array("109","3", "art8", "title1").deep == result(0).deep)
+          assert(Array("110", "99", "art5,art9", "title2").deep == result(1).deep)
+          assert(Array("111", "1", "art3", "title3").deep == result(2).deep)
+          assert(Array("112", "1", "art9", "title4").deep == result(3).deep)
+          assert(Array("113", "88", "art9,art3", "title5").deep == result(4).deep)
         } finally {
           sc.stop
         }
@@ -143,6 +143,9 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
       "art9\tname"
       )
   }
+
+  def artistsLastIndex: Int = { 9 }
+  def releasesLastIndex: Int = { 108 }
 
   def releases(): Array[String] = {
     Array(
