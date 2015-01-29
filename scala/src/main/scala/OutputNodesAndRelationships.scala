@@ -43,15 +43,15 @@ object OutputNodesAndRelationships {
   }
 
 
-  def extractArtistsReleasesRelationships(artists: RDD[Array[String]], releases: RDD[(Array[String], Long)]): RDD[List[Any]] = {
+  def extractArtistsReleasesRelationships(artists: RDD[Array[String]], releases: RDD[Array[String]]): RDD[List[Any]] = {
     val artistsMap = artists.map(artist => (artist(1), artist(0)))
-    val releasesMap =  releases.map(rel => ((rel._1(0), rel._1(3)), rel._2)).flatMap(restructureRelease)
+    val releasesMap =  releases.flatMap(restructureRelease)
     artistsMap.join(releasesMap)
               .map(extractArtistReleaseRelationship)
   }
 
-  def extractReleasesTracksRelationships(releases: RDD[(Array[String], Long)], tracks: RDD[(Array[String], Long)]): RDD[List[Any]] = {
-    val releasesMap = releases.map(rel => (rel._1(0), rel._2))
+  def extractReleasesTracksRelationships(releases: RDD[Array[String]], tracks: RDD[(Array[String], Long)]): RDD[List[Any]] = {
+    val releasesMap = releases.map(rel => (rel(1), rel(0)))
     val tracksMap = tracks.map(track => (track._1(0), track._2))
     releasesMap.join(tracksMap)
                 .map(extractReleaseTrackRelationship)
@@ -64,11 +64,11 @@ object OutputNodesAndRelationships {
               .map(extractArtistTrackRelationship)
   }
 
-  def extractArtistReleaseRelationship(rel: (String, (String, (String, Long)))): List[Any] = {
-    List(rel._2._1, rel._2._2._2, "HAS_TRACKLIST")
+  def extractArtistReleaseRelationship(rel: (String, (String, String))): List[Any] = {
+    List(rel._2._1, rel._2._2, "HAS_TRACKLIST")
   }
 
-  def extractReleaseTrackRelationship(rel: (String, (Long, Long))): List[Any] = {
+  def extractReleaseTrackRelationship(rel: (String, (String, Long))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_TRACK")
   }
 
@@ -76,10 +76,10 @@ object OutputNodesAndRelationships {
     List(rel._2._1, rel._2._2, "HAS_TRACK")
   }
 
-  def restructureRelease(release: ((String, String), Long)): Array[(String, (String, Long))] = {
-    val artists = release._1._2
+  def restructureRelease(release: Array[String]): Array[(String, String)] = {
+    val artists = release(4)
     artists.split(",").map{
-      artist => (artist, (release._1._1, release._2)) //from ((releaseId, artists), index) to (artistId, (releaseId, index))
+      artist => (artist, release(0)) //from (id, artists) to (artistId, id)
     }
   }
 
@@ -96,8 +96,8 @@ object OutputNodesAndRelationships {
     artists.map(artist => artist ++ "Artist").map(_.mkString("\t")).saveAsTextFile("output/artists_nodes")
   }
 
-  def saveReleasesNodes(releases: RDD[(Array[String], Long)]) {
-    releases.map(release => Array(release._1(0), release._1(2), "Tracklist").mkString("\t")).saveAsTextFile("output/tracklists_nodes")
+  def saveReleasesNodes(releases: RDD[Array[String]]) {
+    releases.map(release => Array(release(0), release(1), release(2), "Tracklist").mkString("\t")).saveAsTextFile("output/tracklists_nodes")
   }
 
   def saveTracksNodes(tracks: RDD[(Array[String], Long)]) {
@@ -108,10 +108,9 @@ object OutputNodesAndRelationships {
     artists.map(_.split("\t"))
             .map(artist => Array(artist(0), artist(0), artist(1)))
   }
-  def getReleases(releases: RDD[String], artistsCount: Long): RDD[(Array[String], Long)] = {
+  def getReleases(releases: RDD[String], artistsCount: Long): RDD[Array[String]] = {
     releases.map(_.split("\t"))
-            .zipWithIndex
-            .map(release => (release._1, release._2 + artistsCount))
+            .map(release => Array((release(0).toLong + artistsCount).toString, release(0), release(1), release(2), release(3)))
   }
   def getTracks(tracks: RDD[String], artistsCount: Long, releasesCount: Long ): RDD[(Array[String], Long)] = {
     tracks.map(_.split("\t"))
