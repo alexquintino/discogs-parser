@@ -1,8 +1,8 @@
 require "tempfile"
 
-HEADERS_ARTISTS = %w(discogs_id:int name:string l:label)
-HEADERS_TRACKLISTS = %w(discogs_id:int title:string l:label)
-HEADERS_TRACKS = %w(discogs_id:int title:string l:label)
+HEADERS_ARTISTS = %w(i:id discogs_id:int name:string l:label)
+HEADERS_TRACKLISTS = %w(i:id discogs_id:int title:string l:label)
+HEADERS_TRACKS = %w(i:id title:string l:label)
 HEADERS_RELATIONSHIPS = %w(start end type)
 
 def output_artists_tsv
@@ -33,7 +33,7 @@ def output_relationships_tsv
   headers = Tempfile.new("relationships_headers")
   headers.write HEADERS_RELATIONSHIPS.join("\t") + "\n"
   headers.close
-  %x( cat #{headers.path} output/artist_release_relationship/part-* output/tracklist_tracks_relationship/part-* output/artist_tracks_relationship/part-* > output/relationships.tsv )
+  %x( cat #{headers.path} output/artist_release_relationships/part-* output/tracklist_track_relationships/part-* output/artist_track_relationships/part-* > output/relationships.tsv )
   headers.unlink
 end
 

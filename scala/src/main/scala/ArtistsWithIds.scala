@@ -23,7 +23,7 @@ object ArtistsWithIds {
     // (name_norm, (name, (id, name))
     val found_artists = fav_artists.join(discogs_artists)
 
-    found_artists.map(map => map._2._2).coalesce(1).map(_.mkString("\t")).saveAsTextFile("output/artists_with_ids")
+    found_artists.map(map => map._2._2).coalesce(1).distinct.map(_.mkString("\t")).saveAsTextFile("output/artists_with_ids")
 
     print_not_found_stats(fav_artists, found_artists)
 
