@@ -33,7 +33,7 @@ def output_relationships_tsv
   headers = Tempfile.new("relationships_headers")
   headers.write HEADERS_RELATIONSHIPS.join("\t") + "\n"
   headers.close
-  %x( cat #{headers.path} output/artist_release_relationships/part-* output/tracklist_track_relationships/part-* output/artist_track_relationships/part-* > output/relationships.tsv )
+  %x( cat #{headers.path} output/artist_release_relationships/part-* output/tracklist_track_relationships/part-* output/artist_track_relationships/part-* output/remixer_track_relationship/part-* > output/relationships.tsv )
   headers.unlink
 end
 

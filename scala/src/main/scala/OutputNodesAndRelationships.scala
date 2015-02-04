@@ -38,6 +38,10 @@ object OutputNodesAndRelationships {
       .map(_.mkString("\t"))
       .saveAsTextFile("output/artist_track_relationships")
 
+    extractRemixersTracksRelationships(artists, tracks)
+      .map(_.mkString("\t"))
+      .saveAsTextFile("output/remixer_track_relationship")
+
 
   }
 
@@ -63,6 +67,13 @@ object OutputNodesAndRelationships {
               .map(extractArtistTrackRelationship)
   }
 
+  def extractRemixersTracksRelationships(artists: RDD[Array[String]], tracks: RDD[Array[String]]): RDD[List[Any]] = {
+    val artistsMap = artists.map(artist => (artist(1), artist(0)))
+    val tracksMap = tracks.filter(_.size > 4).flatMap(splitRemixersInTrack)
+    artistsMap.join(tracksMap)
+              .map(extractRemixerTrackRelationship)
+  }
+
   def extractArtistReleaseRelationship(rel: (String, (String, String))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_TRACKLIST")
   }
@@ -73,6 +84,10 @@ object OutputNodesAndRelationships {
 
   def extractArtistTrackRelationship(rel: (String, (String, String))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_TRACK")
+  }
+
+  def extractRemixerTrackRelationship(rel: (String, (String, String))): List[Any] = {
+    List(rel._2._1, rel._2._2, "HAS_REMIX")
   }
 
   def restructureRelease(release: Array[String]): Array[(String, String)] = {
@@ -89,6 +104,12 @@ object OutputNodesAndRelationships {
     }
   }
 
+  def splitRemixersInTrack(track: Array[String]): Array[(String, String)] = {
+    val artists = track(4)
+    artists.split(",").map {
+      artist => (artist, track(0))
+    }
+  }
 
 
   def savaArtistsNodes(artists: RDD[Array[String]]) {

@@ -71,6 +71,23 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
         }
       }
     }
+
+     describe("extractRemixersTracksRelationships") {
+      it("joins the reixers with tracks and extracts the relationships") {
+        val sc = setupContext()
+        try {
+          val artistsRDD = OutputNodesAndRelationships.getArtists(sc.makeRDD(artists))
+          val tracksRDD = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releasesLastIndex)
+
+          val result = OutputNodesAndRelationships.extractRemixersTracksRelationships(artistsRDD, tracksRDD).collect
+          assert(2 == result.size)
+          assert(result.contains(List("art8", "110", "HAS_REMIX")))
+          assert(result.contains(List("art3", "112", "HAS_REMIX")))
+        } finally {
+          sc.stop
+        }
+      }
+    }
   }
 
   describe("restructureRelease") {
@@ -124,9 +141,9 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
         try {
           val result = OutputNodesAndRelationships.getTracks(sc.makeRDD(tracks), releasesLastIndex).collect
           assert(Array("109","3", "art8", "title1").deep == result(0).deep)
-          assert(Array("110", "99", "art5,art9", "title2").deep == result(1).deep)
+          assert(Array("110", "99", "art5,art9", "title2", "art8").deep == result(1).deep)
           assert(Array("111", "1", "art3", "title3").deep == result(2).deep)
-          assert(Array("112", "1", "art9", "title4").deep == result(3).deep)
+          assert(Array("112", "1", "art9", "title4", "art3").deep == result(3).deep)
           assert(Array("113", "88", "art9,art3", "title5").deep == result(4).deep)
         } finally {
           sc.stop
@@ -159,9 +176,9 @@ class OutputNodesAndRelationshipsSpec extends FunSpec with Matchers {
   def tracks(): Array[String] = {
     Array(
       "3\tart8\ttitle1",
-      "99\tart5,art9\ttitle2",
+      "99\tart5,art9\ttitle2\tart8",
       "1\tart3\ttitle3",
-      "1\tart9\ttitle4",
+      "1\tart9\ttitle4\tart3",
       "88\tart9,art3\ttitle5"
       )
   }

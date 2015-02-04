@@ -13,18 +13,18 @@ object FilterArtistsAndReleases {
     val logger = Logger.getLogger("spark")
 
     // artist_id / name
-    val artists_ids = sc.textFile("output/artists_with_ids")
+    val artistsIds = sc.textFile("output/artists_with_ids")
                             .map(_.split("\t"))
                             .map(artist => artist(0))
                             .collect.toSet
-    val artists_ids_broadcast = sc.broadcast(artists_ids)
+    val artistsIdsBroadcast = sc.broadcast(artistsIds)
 
 
     // release_id / artists / title / remixers - filter out empty tracks
     val tracks = sc.textFile("output/discogs_tracks.tsv").map(_.split("\t")).filter(_.size > 2).cache()
 
     // release ids taken from selected tracks - there will be repeated releases
-    val releaseIdsFromTracks = grabTracksForArtists(tracks, artists_ids_broadcast.value).map(track => track(0)).distinct.collect.toSet
+    val releaseIdsFromTracks = grabTracksForArtists(tracks, artistsIdsBroadcast.value).map(track => track(0)).distinct.collect.toSet
 
 
     val releaseIdsFromTracksBroadcast = sc.broadcast(releaseIdsFromTracks)
@@ -58,12 +58,13 @@ object FilterArtistsAndReleases {
     finalTrackList.coalesce(8).map(_.mkString("\t")).saveAsTextFile("output/tracks")
   }
 
-  def grabTracksForArtists(tracks: RDD[Array[String]], artists_ids: Set[String]): RDD[Array[String]] = {
-    tracks.filter(track => containsArtists(trackArtists(track), artists_ids))
+  def grabTracksForArtists(tracks: RDD[Array[String]], artistsIds: Set[String]): RDD[Array[String]] = {
+    tracks.filter(track => containsArtists(trackArtists(track), artistsIds))
   }
 
-  def containsArtists(artists: Array[String], artists_ids: Set[String]): Boolean = {
-    artists.map(id => artists_ids.contains(id)).fold(false)((bool, res) => bool || res)
+  // checks if the artists in an Array are present in a Set of artists. Then reduces it to a single true/false
+  def containsArtists(artists: Array[String], artistsIds: Set[String]): Boolean = {
+    artists.map(id => artistsIds.contains(id)).fold(false)((bool, res) => bool || res)
   }
 
   def trackArtists(track: Array[String]): Array[String] = {
