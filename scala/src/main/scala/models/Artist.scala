@@ -1,6 +1,6 @@
 package models
 
-class Artist(id: String, var name: String) extends Serializable{
+class Artist(val discogsId: String, var name: String) extends Serializable{
   name = fixName(name)
 
   def normalizedName: String = {
