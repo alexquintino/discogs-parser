@@ -11,7 +11,7 @@ object ProcessDiscogs {
 
     var artists = getArtists(sc)
     artists = Filters.favoriteArtists(artists, getFavoriteArtistsNames(sc, args(0)))
-    NodeWriter.writeNodes(artists, "artist")
+    val artistsWithIndex = NodeWriter.writeNodes(artists, "artist")
 
     val tracks = getTracks(sc)
     val filteredTracks = Filters.filterTracksBasedOnArtists(tracks, artists)
@@ -19,12 +19,16 @@ object ProcessDiscogs {
     var releases = getReleases(sc)
     releases = Filters.filterReleasesBasedOnTracks(releases, filteredTracks)
     releases = Filters.filterReleasesBasedOnMasters(releases)
-    NodeWriter.writeNodes(releases, "release")
+    val releasesWithIndex = NodeWriter.writeNodes(releases, "release")
 
+    Relationships.writeArtistToReleases(artistsWithIndex, releasesWithIndex)
 
     val finalTrackList = Filters.filterTracksBasedOnReleases(tracks, releases)
-    NodeWriter.writeNodes(finalTrackList, "track")
+    val tracksWithIndex = NodeWriter.writeNodes(finalTrackList, "track")
 
+    Relationships.writeReleasesToTracks(releasesWithIndex, tracksWithIndex)
+    Relationships.writeArtistsToTracks(artistsWithIndex, tracksWithIndex)
+    Relationships.writeRemixersToTracks(artistsWithIndex, tracksWithIndex)
   }
 
   def getArtists(sc: SparkContext): RDD[Artist] = {
