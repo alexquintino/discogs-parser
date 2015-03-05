@@ -3,6 +3,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext._
 
 object Filters {
+  def filterTracksBasedOnReleases(tracks: RDD[Track], releases: RDD[Release]): RDD[Track] = {
+    val relsIds = releases.map(_.id).collect.toSet
+    tracks.filter(t => relsIds.contains(t.release))
+  }
 
   def filterReleasesBasedOnTracks(releases: RDD[Release], tracks: RDD[Track]): RDD[Release] = {
     val releasesIds = tracks.map(_.release).collect.toSet

@@ -11,13 +11,14 @@ object ProcessDiscogs {
     var artists = getArtists(sc)
     artists = Filters.favoriteArtists(artists, getFavoriteArtistsNames(sc, args(0)))
 
-    var tracks = getTracks(sc)
-    tracks = Filters.filterTracksBasedOnArtists(tracks, artists)
+    val tracks = getTracks(sc)
+    val filteredTracks = Filters.filterTracksBasedOnArtists(tracks, artists)
 
     var releases = getReleases(sc)
-    releases = Filters.filterReleasesBasedOnTracks(releases, tracks)
+    releases = Filters.filterReleasesBasedOnTracks(releases, filteredTracks)
     releases = Filters.filterReleasesBasedOnMasters(releases)
 
+    val finalTrackList = Filters.filterTracksBasedOnReleases(tracks, releases)
 
   }
 

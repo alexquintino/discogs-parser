@@ -1,6 +1,7 @@
 import models.{Release, Artist, Track}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
 import org.scalatest._
 
 class FiltersSpec extends FunSpec with Matchers {
@@ -52,6 +53,20 @@ class FiltersSpec extends FunSpec with Matchers {
       assert(result.length == 2)
       assert(result.map(_.id).deep == Array("10", "5").deep)
       assert(result.map(_.master).deep == Array("", "66").deep)
+    } finally {
+      sc.stop()
+    }
+  }
+
+  it("filters tracks based on a list of releases") {
+    val sc = setupContext()
+    try {
+      val selectedReleases = releases(sc).filter(r => r.id == "2" || r.id == "8")
+      val result = Filters.filterTracksBasedOnReleases(tracks(sc), selectedReleases).collect()
+
+      assert(result.length == 2)
+      assert(result.map(_.release).deep == Array("2", "8").deep)
+      assert(result.map(_.title).deep == Array("Some name", "Some other other name").deep)
     } finally {
       sc.stop()
     }
