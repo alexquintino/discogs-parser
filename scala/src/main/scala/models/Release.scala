@@ -1,6 +1,8 @@
 package models
 
-class Release(val id: String, val master: String, val title: String, val artistsIds: String) extends Serializable {
+class Release(val discogsId: String, val master: String, val title: String, val artistsIds: String) extends Serializable with Node {
+  var id = discogsId
+  val artists = artistsIds.split(",")
 
- val artists = artistsIds.split(",")
+  def asNode: String = List(id, title, "Tracklist").mkString("\t")
 }

@@ -34,11 +34,11 @@ object ProcessDiscogs {
   }
 
   def getTracks(sc: SparkContext): RDD[Track] = {
-    sc.textFile("output/discogs_tracks.tsv").map(_.split("\t")).filter(_.size > 2).map {
-      fields => if (fields.length == 3)
-        new Track(fields(0), fields(1), fields(2), "")
+    sc.textFile("output/discogs_tracks.tsv").map(_.split("\t")).filter(_.size > 2).zipWithIndex().map {
+      case (fields, index) => if (fields.length == 3)
+        new Track(index.toString, fields(0), fields(1), fields(2), "")
       else
-        new Track(fields(0), fields(1), fields(2), fields(3))
+        new Track(index.toString, fields(0), fields(1), fields(2), fields(3))
     }
   }
 

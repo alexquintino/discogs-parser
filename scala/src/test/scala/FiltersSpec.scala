@@ -1,12 +1,11 @@
 import models.{Release, Artist, Track}
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.scalatest._
 
 class FiltersSpec extends FunSpec with Matchers {
   it("filters out favorite artists") {
-    val sc = setupContext()
+    val sc = SparkUtil.context()
     try {
       val result = Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc)).collect()
       assert(result.length == 2)
@@ -18,7 +17,7 @@ class FiltersSpec extends FunSpec with Matchers {
   }
 
   it("filters out tracks based on a set of artists") {
-    val sc = setupContext()
+    val sc = SparkUtil.context()
     try {
       val favArtists = Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc))
       val result = Filters.filterTracksBasedOnArtists(tracks(sc), favArtists).collect()
@@ -31,7 +30,7 @@ class FiltersSpec extends FunSpec with Matchers {
   }
 
   it("filters out releases based on tracks") {
-    val sc = setupContext()
+    val sc = SparkUtil.context()
     try {
       val filteredTracks = Filters.filterTracksBasedOnArtists(tracks(sc), Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc)))
       val result = Filters.filterReleasesBasedOnTracks(releases(sc), filteredTracks).collect()
@@ -45,7 +44,7 @@ class FiltersSpec extends FunSpec with Matchers {
   }
 
   it("filters out releases based on the master") {
-    val sc = setupContext()
+    val sc = SparkUtil.context()
     try {
       val filteredReleases = Filters.filterReleasesBasedOnTracks(releases(sc), Filters.filterTracksBasedOnArtists(tracks(sc), Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc))))
       val result = Filters.filterReleasesBasedOnMasters(filteredReleases).collect()
@@ -59,7 +58,7 @@ class FiltersSpec extends FunSpec with Matchers {
   }
 
   it("filters tracks based on a list of releases") {
-    val sc = setupContext()
+    val sc = SparkUtil.context()
     try {
       val selectedReleases = releases(sc).filter(r => r.id == "2" || r.id == "8")
       val result = Filters.filterTracksBasedOnReleases(tracks(sc), selectedReleases).collect()
@@ -109,11 +108,11 @@ class FiltersSpec extends FunSpec with Matchers {
 
   def tracks(sc:SparkContext) = {
     sc.parallelize( List(
-      new Track("0","1","Some", ""),
-      new Track("2","3","Some name", "44"),
-      new Track("5","6","Some other name", "4"),
-      new Track("8","2","Some other other name", "10,11"),
-      new Track("10","4","Some other other other name", "")))
+      new Track("1","0","1","Some", ""),
+      new Track("2","2","3","Some name", "44"),
+      new Track("3","5","6","Some other name", "4"),
+      new Track("4","8","2","Some other other name", "10,11"),
+      new Track("5","10","4","Some other other other name", "")))
   }
 
   def releases(sc:SparkContext) = {
@@ -130,11 +129,5 @@ class FiltersSpec extends FunSpec with Matchers {
 
   def favoriteArtistsNames(sc:SparkContext) = {
     sc.parallelize(List("artist 2", "Artist 4"))
-  }
-
-  def setupContext(): SparkContext = {
-    Logger.getLogger("org").setLevel(Level.WARN)
-    Logger.getLogger("akka").setLevel(Level.WARN)
-    new SparkContext("local[8]", "testing")
   }
 }
