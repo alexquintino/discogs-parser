@@ -1,5 +1,6 @@
-import models.{Node, Release, Track, Artist}
-import org.apache.spark.SparkContext._
+package main
+
+import models.{Artist, Release, Track}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -19,6 +20,7 @@ object ProcessDiscogs {
     releases = Filters.filterReleasesBasedOnTracks(releases, filteredTracks)
     releases = Filters.filterReleasesBasedOnMasters(releases)
     NodeWriter.writeNodes(releases, "release")
+
 
     val finalTrackList = Filters.filterTracksBasedOnReleases(tracks, releases)
     NodeWriter.writeNodes(finalTrackList, "track")

@@ -1,6 +1,8 @@
-import models.{Release, Artist, Track}
+package test
+
+import main.Filters
+import models.{Artist, Release, Track}
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
 import org.scalatest._
 
 class FiltersSpec extends FunSpec with Matchers {

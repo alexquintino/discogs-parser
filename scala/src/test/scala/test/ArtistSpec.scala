@@ -1,3 +1,5 @@
+package test
+
 import models.Artist
 import org.scalatest._
 

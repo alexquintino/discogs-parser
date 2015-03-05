@@ -1,6 +1,8 @@
-import models.{Release, Track, Artist}
-import org.apache.spark.rdd.RDD
+package main
+
+import models.{Artist, Release, Track}
 import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
 
 object Filters {
   def filterTracksBasedOnReleases(tracks: RDD[Track], releases: RDD[Release]): RDD[Track] = {

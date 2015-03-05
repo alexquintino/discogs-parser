@@ -1,13 +1,15 @@
+package main
+
 import models.Node
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 object NodeWriter {
   var lastIndex = 0L
 
-  def writeNodes[T](nodes: RDD[T], nodeType: String) {
+  def writeNodes[T](nodes: RDD[T], nodeType: String): RDD[(T with Node, Long)] = {
     val nodesWithIndex = addIndex(nodes)
     nodesWithIndex.map { case (node:Node, index) => s"${index}\t${node.asNode}" }.saveAsTextFile(s"${nodeType}_nodes")
+    nodesWithIndex
   }
 
   def addIndex[T](nodes: RDD[T]): RDD[(T with Node, Long)] = {

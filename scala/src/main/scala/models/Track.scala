@@ -9,4 +9,6 @@ class Track(id0: String, val release: String, var artistsIds: String,  val title
 
   def asNode: String = List(id, title, "Track").mkString("\t")
 
+  def hasRemixers: Boolean = !remixers.isEmpty
+
 }
