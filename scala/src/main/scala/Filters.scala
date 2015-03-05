@@ -19,7 +19,7 @@ object Filters {
   }
 
   def filterTracksBasedOnArtists(tracks: RDD[Track], artists: RDD[Artist]): RDD[Track] = {
-    val artistsIds = artists.map(_.discogsId).collect().toSet[String]
+    val artistsIds = artists.map(_.id).collect().toSet[String]
     tracks.filter(track => contains(track.allArtists, artistsIds))
   }
 

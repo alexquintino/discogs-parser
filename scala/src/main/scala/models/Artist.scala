@@ -1,7 +1,8 @@
 package models
 
-class Artist(val discogsId: String, var name: String) extends Serializable{
+class Artist(discogsId: String, var name: String) extends Serializable with Node {
   name = fixName(name)
+  var id = discogsId
 
   def normalizedName: String = {
     Artist.normalize(name)
@@ -24,6 +25,8 @@ class Artist(val discogsId: String, var name: String) extends Serializable{
     val name_without_number = pattern.replaceAllIn(name, "")
     return (name_without_number, number)
   }
+
+  def asNode: String = List(id, name, "Artist").mkString("\t")
 }
 
 object Artist {

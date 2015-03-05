@@ -1,4 +1,4 @@
-import models.{Release, Track, Artist}
+import models.{Node, Release, Track, Artist}
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
@@ -10,6 +10,7 @@ object ProcessDiscogs {
 
     var artists = getArtists(sc)
     artists = Filters.favoriteArtists(artists, getFavoriteArtistsNames(sc, args(0)))
+    NodeWriter.writeNodes(artists, "artist")
 
     val tracks = getTracks(sc)
     val filteredTracks = Filters.filterTracksBasedOnArtists(tracks, artists)
@@ -17,13 +18,15 @@ object ProcessDiscogs {
     var releases = getReleases(sc)
     releases = Filters.filterReleasesBasedOnTracks(releases, filteredTracks)
     releases = Filters.filterReleasesBasedOnMasters(releases)
+    NodeWriter.writeNodes(releases, "release")
 
     val finalTrackList = Filters.filterTracksBasedOnReleases(tracks, releases)
+    NodeWriter.writeNodes(finalTrackList, "track")
 
   }
 
   def getArtists(sc: SparkContext): RDD[Artist] = {
-    sc.textFile("data/discogs_artists.csv").map(_.split("\t")).map { case fields:Array[String] => new Artist(fields(0), fields(1)) }
+    sc.textFile("data/discogs_artists.tsv").map(_.split("\t")).map { case fields:Array[String] => new Artist(fields(0), fields(1)) }
   }
 
   def getFavoriteArtistsNames(sc: SparkContext, file: String): RDD[String] = {
