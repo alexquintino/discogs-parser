@@ -1,4 +1,4 @@
-import models.{Artist, Track}
+import models.{Release, Artist, Track}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 import org.scalatest._
@@ -20,10 +20,38 @@ class FiltersSpec extends FunSpec with Matchers {
     val sc = setupContext()
     try {
       val favArtists = Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc))
-      val result = Filters.tracks(tracks(sc), favArtists).collect()
+      val result = Filters.filterTracksBasedOnArtists(tracks(sc), favArtists).collect()
+
+      assert(result.length == 3)
+      assert(result.map(_.release).deep == Array("5", "8", "10").deep)
+    } finally {
+      sc.stop()
+    }
+  }
+
+  it("filters out releases based on tracks") {
+    val sc = setupContext()
+    try {
+      val filteredTracks = Filters.filterTracksBasedOnArtists(tracks(sc), Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc)))
+      val result = Filters.filterReleasesBasedOnTracks(releases(sc), filteredTracks).collect()
+
+      assert(result.length == 3)
+      assert(result.map(_.id).deep == Array("5", "8", "10").deep)
+      assert(result.map(_.master).deep == Array("66", "66", "").deep)
+    } finally {
+      sc.stop()
+    }
+  }
+
+  it("filters out releases based on the master") {
+    val sc = setupContext()
+    try {
+      val filteredReleases = Filters.filterReleasesBasedOnTracks(releases(sc), Filters.filterTracksBasedOnArtists(tracks(sc), Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc))))
+      val result = Filters.filterReleasesBasedOnMasters(filteredReleases).collect()
 
       assert(result.length == 2)
-      assert(result.map(_.release).deep == Array("5", "8").deep)
+      assert(result.map(_.id).deep == Array("10", "5").deep)
+      assert(result.map(_.master).deep == Array("", "66").deep)
     } finally {
       sc.stop()
     }
@@ -48,8 +76,20 @@ class FiltersSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("oldestRelease") {
+    it("returns the oldestRelease correctly") {
+      val release1 = new Release("99", "33", "Release1", "3")
+      val release2 = new Release("999", "33", "Release1", "3")
+      assert(Filters.oldestRelease(release1, release2) == release1)
+    }
+  }
+
   def artists(sc:SparkContext) = {
-    sc.parallelize(List(new Artist("1", "Artist 1"), new Artist("2", "Artist 2"), new Artist("3", "Artist 3"), new Artist("4", "Artist 4")))
+    sc.parallelize(List(
+      new Artist("1", "Artist 1"),
+      new Artist("2", "Artist 2"),
+      new Artist("3", "Artist 3"),
+      new Artist("4", "Artist 4")))
   }
 
   def tracks(sc:SparkContext) = {
@@ -57,7 +97,19 @@ class FiltersSpec extends FunSpec with Matchers {
       new Track("0","1","Some", ""),
       new Track("2","3","Some name", "44"),
       new Track("5","6","Some other name", "4"),
-      new Track("8","2","Some other other name", "10,11")
+      new Track("8","2","Some other other name", "10,11"),
+      new Track("10","4","Some other other other name", "")))
+  }
+
+  def releases(sc:SparkContext) = {
+    sc.parallelize(List(
+      new Release("1", "33", "Title1", "2,3"),
+      new Release("2", "44", "Title2", "4"),
+      new Release("3", "55", "Title3", "1"),
+      new Release("4", "33", "Title1", "2,3"),
+      new Release("5", "66", "Title5", "10,11"),
+      new Release("8", "66", "Title5", "10,11"),
+      new Release("10", "", "Title10", "4")
     ))
   }
 
