@@ -11,4 +11,11 @@ class Track(id0: String, val release: String, var artistsIds: String,  val title
 
   def hasRemixers: Boolean = !remixers.isEmpty
 
+  override def hashCode: Int = {
+    java.util.Objects.hash(allArtists.sorted(Ordering.String).mkString(","), normalizedTitle)
+  }
+
+  private
+  def normalizedTitle:String = title.toLowerCase()
+
 }
