@@ -1,6 +1,5 @@
-package test
+package main
 
-import main.NodeWriter
 import models.Artist
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

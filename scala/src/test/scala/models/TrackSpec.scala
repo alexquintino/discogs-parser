@@ -1,6 +1,5 @@
-package test
+package models
 
-import models.Track
 import org.scalatest._
 
 class TrackSpec extends FunSpec with Matchers {

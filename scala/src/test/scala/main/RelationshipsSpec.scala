@@ -1,6 +1,5 @@
-package test
+package main
 
-import main.Relationships
 import models.{Track, Artist, Release}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

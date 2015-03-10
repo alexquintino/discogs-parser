@@ -1,6 +1,5 @@
-package test
+package models
 
-import models.Artist
 import org.scalatest._
 
 class ArtistSpec extends FunSpec with Matchers {
