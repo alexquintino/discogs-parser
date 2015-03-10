@@ -13,7 +13,8 @@ object ProcessDiscogs {
     artists = Filters.favoriteArtists(artists, getFavoriteArtistsNames(sc, args(0)))
     val artistsWithIndex = NodeWriter.writeNodes(artists, "artist")
 
-    val tracks = getTracks(sc)
+    var tracks = getTracks(sc)
+    tracks = TrackDeduplicator.deduplicate(tracks)
     val filteredTracks = Filters.filterTracksBasedOnArtists(tracks, artists)
 
     var releases = getReleases(sc)

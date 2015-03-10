@@ -7,11 +7,11 @@ import org.apache.spark.rdd.RDD
 object Filters {
   def filterTracksBasedOnReleases(tracks: RDD[Track], releases: RDD[Release]): RDD[Track] = {
     val relsIds = releases.map(_.id).collect.toSet
-    tracks.filter(t => relsIds.contains(t.release))
+    tracks.filter(t => contains(t.releases, relsIds))
   }
 
   def filterReleasesBasedOnTracks(releases: RDD[Release], tracks: RDD[Track]): RDD[Release] = {
-    val releasesIds = tracks.map(_.release).collect.toSet
+    val releasesIds = tracks.flatMap(_.releases).collect.toSet
     releases.filter(rel => releasesIds.contains(rel.id))
   }
 

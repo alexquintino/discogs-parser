@@ -38,7 +38,7 @@ object Relationships {
 
   def extractReleasesTracksRelationships(releases: RDD[(Release, Long)], tracks: RDD[(Track, Long)]): RDD[List[Any]] = {
     val releasesMap = releases.map { case (rel, index) => (rel.id, index.toString) }
-    val tracksMap = tracks.map { case (track, index) => (track.release, index.toString) }
+    val tracksMap = tracks.flatMap(restructureTrack)
     releasesMap.join(tracksMap)
                 .map(extractReleaseTrackRelationship)
   }
@@ -73,6 +73,10 @@ object Relationships {
 
   def restructureRelease(release: (Release, Long)): Array[(String, String)] = {
     release._1.artists.map { artist => (artist, release._2.toString) }
+  }
+
+  def restructureTrack(track: (Track, Long)): Array[(String, String)] = {
+    track._1.releases.map(releaseId => (releaseId, track._2.toString))
   }
 
   def artistsMap(artists: RDD[(Artist, Long)]): RDD[(String, String)] = artists.map { case (artist, index) => (artist.id, index.toString) }

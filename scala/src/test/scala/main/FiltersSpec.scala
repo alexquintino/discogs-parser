@@ -24,7 +24,7 @@ class FiltersSpec extends FunSpec with Matchers {
       val result = Filters.filterTracksBasedOnArtists(tracks(sc), favArtists).collect()
 
       assert(result.length == 3)
-      assert(result.map(_.release).deep == Array("5", "8", "10").deep)
+      assert(result.flatMap(_.releases).deep == Array("5", "8", "10").deep)
     } finally {
       sc.stop()
     }
@@ -65,7 +65,7 @@ class FiltersSpec extends FunSpec with Matchers {
       val result = Filters.filterTracksBasedOnReleases(tracks(sc), selectedReleases).collect()
 
       assert(result.length == 2)
-      assert(result.map(_.release).deep == Array("2", "8").deep)
+      assert(result.flatMap(_.releases).deep == Array("2", "8").deep)
       assert(result.map(_.title).deep == Array("Some name", "Some other other name").deep)
     } finally {
       sc.stop()

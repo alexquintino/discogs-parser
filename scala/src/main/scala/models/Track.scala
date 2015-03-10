@@ -1,8 +1,11 @@
 package models
 
-class Track(id0: String, val release: String, var artistsIds: String,  val title: String, val remixersIds: String) extends Serializable with Node {
+import scala.util.hashing.MurmurHash3
+
+class Track(id0: String, release: String, var artistsIds: String,  val title: String, val remixersIds: String) extends Serializable with Node {
   val artists = artistsIds.split(",")
   val remixers = remixersIds.split(",")
+  val releases = Array(release)
   var id = id0
 
   def allArtists: Array[String] = artists ++ remixers
@@ -12,7 +15,13 @@ class Track(id0: String, val release: String, var artistsIds: String,  val title
   def hasRemixers: Boolean = !remixers.isEmpty
 
   override def hashCode: Int = {
-    java.util.Objects.hash(allArtists.sorted(Ordering.String).mkString(","), normalizedTitle)
+    val fields = allArtists.sorted(Ordering.String) ++ normalizedTitle
+    MurmurHash3.arrayHash(fields)
+  }
+
+  def addReleases(otherReleases: Array[String]): Track = {
+    releases ++ otherReleases
+    this
   }
 
   private
