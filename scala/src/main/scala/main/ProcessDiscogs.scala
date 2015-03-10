@@ -32,7 +32,7 @@ object ProcessDiscogs {
   }
 
   def getArtists(sc: SparkContext): RDD[Artist] = {
-    sc.textFile("data/discogs_artists.tsv").map(_.split("\t")).map { case fields:Array[String] => new Artist(fields(0), fields(1)) }
+    sc.textFile("output/discogs_artists.tsv").map(_.split("\t")).map { case fields:Array[String] => new Artist(fields(0), fields(1)) }
   }
 
   def getFavoriteArtistsNames(sc: SparkContext, file: String): RDD[String] = {

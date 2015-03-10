@@ -8,7 +8,7 @@ object NodeWriter {
 
   def writeNodes[T <: Node](nodes: RDD[T], nodeType: String): RDD[(T, Long)] = {
     val nodesWithIndex = addIndex(nodes)
-    nodesWithIndex.map { case (node, index) => s"${index}\t${node.asNode}" }.saveAsTextFile(s"${nodeType}_nodes")
+    nodesWithIndex.map { case (node, index) => s"${index}\t${node.asNode}" }.saveAsTextFile(s"output/${nodeType}_nodes")
     nodesWithIndex
   }
 
