@@ -3,31 +3,32 @@ package main
 import models.{Track, Artist, Release}
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
+import FileManager._
 
 object Relationships {
 
   def writeArtistToReleases(artists: RDD[(Artist, Long)], releases: RDD[(Release, Long)]) {
     extractArtistsReleasesRelationships(artists, releases)
       .map(_.mkString("\t"))
-      .saveAsTextFile("output/artist_release_relationships")
+      .saveAsTextFile(Files.ArtistReleaseRelationship.toString)
   }
 
   def writeReleasesToTracks(releases: RDD[(Release, Long)], tracks: RDD[(Track, Long)]) {
     extractReleasesTracksRelationships(releases, tracks)
       .map(_.mkString("\t"))
-      .saveAsTextFile("output/tracklist_track_relationships")
+      .saveAsTextFile(Files.TracklistTrackRelationship.toString)
   }
 
   def writeArtistsToTracks(artists: RDD[(Artist, Long)], tracks: RDD[(Track, Long)]) {
     extractArtistsTracksRelationships(artists, tracks)
       .map(_.mkString("\t"))
-      .saveAsTextFile("output/artist_track_relationships")
+      .saveAsTextFile(Files.ArtistTracksRelationship.toString)
   }
 
   def writeRemixersToTracks(artists: RDD[(Artist, Long)], tracks: RDD[(Track, Long)]) {
     extractRemixersTracksRelationships(artists, tracks)
       .map(_.mkString("\t"))
-      .saveAsTextFile("output/remixer_track_relationship")
+      .saveAsTextFile(Files.RemixerTrackRelationship.toString)
   }
 
   def extractArtistsReleasesRelationships(artists: RDD[(Artist, Long)], releases: RDD[(Release, Long)]): RDD[List[Any]] = {

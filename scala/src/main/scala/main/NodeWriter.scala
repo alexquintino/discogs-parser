@@ -1,5 +1,6 @@
 package main
 
+import main.FileManager.Files
 import models.Node
 import org.apache.spark.rdd.RDD
 
@@ -8,7 +9,7 @@ object NodeWriter {
 
   def writeNodes[T <: Node](nodes: RDD[T], nodeType: String): RDD[(T, Long)] = {
     val nodesWithIndex = addIndex(nodes)
-    nodesWithIndex.map { case (node, index) => s"${index}\t${node.asNode}" }.saveAsTextFile(s"output/${nodeType}_nodes")
+    nodesWithIndex.map { case (node, index) => s"${index}\t${node.asNode}" }.saveAsTextFile(Files.forNodes(nodeType))
     nodesWithIndex
   }
 
