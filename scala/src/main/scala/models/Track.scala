@@ -14,7 +14,7 @@ class Track(id0: String, release: String, var artistsIds: String,  val title: St
 
   def hasRemixers: Boolean = !remixers.isEmpty
 
-  override def hashCode: Int = {
+  def hash: Int = {
     val fields = allArtists.sorted(Ordering.String) ++ normalizedTitle
     MurmurHash3.arrayHash(fields)
   }

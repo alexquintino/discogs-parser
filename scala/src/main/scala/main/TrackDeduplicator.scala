@@ -6,7 +6,7 @@ import org.apache.spark.SparkContext._
 
 object TrackDeduplicator {
   def deduplicate(tracks: RDD[Track]): RDD[Track] = {
-    val tracksWithHash = tracks.map(track => (track.hashCode, track))
+    val tracksWithHash = tracks.map(track => (track.hash, track))
     tracksWithHash.reduceByKey(mergeTracks(_, _)).map { case (hash, track) => track}
   }
 
