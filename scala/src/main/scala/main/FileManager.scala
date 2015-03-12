@@ -19,6 +19,11 @@ object FileManager {
     val TracklistNodes = Value(s"$outputPath/tracklist_nodes")
     val TrackNodes = Value(s"$outputPath/track_nodes")
 
+    val ArtistNodesTSV = Value("output/artist_nodes.tsv")
+    val TracklistNodesTSV = Value("output/tracklist_nodes.tsv")
+    val TrackNodesTSV = Value("output/track_nodes.tsv")
+    val RelationshipsTSV = Value("output/relationships.tsv")
+
     def forNodes(nodeType:String): String = {
       Files.withName(s"$outputPath/${nodeType.toLowerCase}_nodes").toString
     }
