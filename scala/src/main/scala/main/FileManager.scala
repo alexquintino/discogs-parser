@@ -3,22 +3,24 @@ package main
 import sys.process._
 
 object FileManager {
+  val outputPath = sys.env("DISCOGSPARSER_OUTPUT_PATH")
+
   object Files extends Enumeration {
-    val DiscogsArtists = Value("output/discogs_artists.tsv")
-    val DiscogsReleases = Value("output/discogs_releases.tsv")
-    val DiscogsTracks = Value("output/discogs_tracks.tsv")
+    val DiscogsArtists = Value(s"$outputPath/discogs_artists.tsv")
+    val DiscogsReleases = Value(s"$outputPath/discogs_releases.tsv")
+    val DiscogsTracks = Value(s"$outputPath/discogs_tracks.tsv")
 
-    val ArtistTracksRelationship = Value("output/artist_track_relationships")
-    val ArtistReleaseRelationship = Value("output/artist_release_relationships")
-    val TracklistTrackRelationship = Value("output/tracklist_track_relationships")
-    val RemixerTrackRelationship = Value("output/remixer_track_relationship")
+    val ArtistTracksRelationship = Value(s"$outputPath/artist_track_relationships")
+    val ArtistReleaseRelationship = Value(s"$outputPath/artist_release_relationships")
+    val TracklistTrackRelationship = Value(s"$outputPath/tracklist_track_relationships")
+    val RemixerTrackRelationship = Value(s"$outputPath/remixer_track_relationship")
 
-    val ArtistNodes = Value("output/artist_nodes")
-    val TracklistNodes = Value("output/tracklist_nodes")
-    val TrackNodes = Value("output/track_nodes")
+    val ArtistNodes = Value(s"$outputPath/artist_nodes")
+    val TracklistNodes = Value(s"$outputPath/tracklist_nodes")
+    val TrackNodes = Value(s"$outputPath/track_nodes")
 
     def forNodes(nodeType:String): String = {
-      Files.withName(s"output/${nodeType.toLowerCase}_nodes").toString
+      Files.withName(s"$outputPath/${nodeType.toLowerCase}_nodes").toString
     }
   }
 
