@@ -4,6 +4,14 @@ import sys.process._
 
 object FileManager {
   val outputPath = sys.env("DISCOGSPARSER_OUTPUT_PATH")
+  val intermediateOutputs = List(
+    Files.ArtistReleaseRelationship,
+    Files.ArtistTracksRelationship,
+    Files.TracklistTrackRelationship,
+    Files.RemixerTrackRelationship,
+    Files.ArtistNodes,
+    Files.TracklistNodes,
+    Files.TrackNodes)
 
   object Files extends Enumeration {
     val DiscogsArtists = Value(s"$outputPath/discogs_artists.tsv")
@@ -29,18 +37,10 @@ object FileManager {
     }
   }
 
-  def cleanup {
-    outputs.foreach(delete)
+  def cleanIntermediateOutputs {
+    intermediateOutputs.foreach(delete)
   }
 
   private
   def delete(path:Files.Value) = s"rm -r ${path.toString}".!
-  def outputs = List(
-    Files.ArtistReleaseRelationship,
-    Files.ArtistTracksRelationship,
-    Files.TracklistTrackRelationship,
-    Files.RemixerTrackRelationship,
-    Files.ArtistNodes,
-    Files.TracklistNodes,
-    Files.TrackNodes)
 }

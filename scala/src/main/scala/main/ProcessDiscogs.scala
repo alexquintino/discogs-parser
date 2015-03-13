@@ -9,7 +9,7 @@ object ProcessDiscogs {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("discogs-parser")
     val sc = new SparkContext(conf)
-    FileManager.cleanup
+    FileManager.cleanIntermediateOutputs
 
     var artists = getArtists(sc)
     artists = Filters.favoriteArtists(artists, getFavoriteArtistsNames(sc, args(0)))
@@ -34,6 +34,7 @@ object ProcessDiscogs {
     Relationships.writeRemixersToTracks(artistsWithIndex, tracksWithIndex)
 
     MergeOutput.mergeAll
+    FileManager.cleanIntermediateOutputs
   }
 
   def getArtists(sc: SparkContext): RDD[Artist] = {
