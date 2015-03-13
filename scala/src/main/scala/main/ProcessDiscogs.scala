@@ -32,6 +32,8 @@ object ProcessDiscogs {
     Relationships.writeReleasesToTracks(releasesWithIndex, tracksWithIndex)
     Relationships.writeArtistsToTracks(artistsWithIndex, tracksWithIndex)
     Relationships.writeRemixersToTracks(artistsWithIndex, tracksWithIndex)
+
+    MergeOutput.mergeAll
   }
 
   def getArtists(sc: SparkContext): RDD[Artist] = {

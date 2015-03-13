@@ -7,20 +7,31 @@ import main.FileManager.Files
 
 object MergeOutput {
 
+  val ArtistHeaders = "i:id discogs_id:int name:string l:label\n"
+  val TracklistHeaders = "i:id discogs_id:int title:string l:label\n"
+  val TrackHeaders = "i:id title:string l:label\n"
+  val RelationshipsHeader = "start end type\n"
+
+  def mergeAll {
+    mergeArtistNodes
+    mergeTracklistNodes
+    mergeTrackNodes
+    mergeRelationships
+  }
   def mergeArtistNodes {
-    mergeNodes(artistHeaders, Files.ArtistNodes, Files.ArtistNodesTSV)
+    mergeNodes(ArtistHeaders, Files.ArtistNodes, Files.ArtistNodesTSV)
   }
 
   def mergeTracklistNodes {
-    mergeNodes(tracklistHeaders, Files.TracklistNodes, Files.TracklistNodesTSV)
+    mergeNodes(TracklistHeaders, Files.TracklistNodes, Files.TracklistNodesTSV)
   }
 
   def mergeTrackNodes {
-    mergeNodes(tracklistHeaders, Files.TracklistNodes, Files.TracklistNodesTSV)
+    mergeNodes(TrackHeaders, Files.TrackNodes, Files.TrackNodesTSV)
   }
 
   def mergeRelationships {
-    val headersFile = writeToTempFile(relationshipsHeader)
+    val headersFile = writeToTempFile(RelationshipsHeader)
     val relationships = List(Files.ArtistReleaseRelationship, Files.ArtistTracksRelationship, Files.TracklistTrackRelationship, Files.RemixerTrackRelationship)
     val inputPaths = relationships.map(_.toString + "/part-*").mkString(" ")
     val outputPath = Files.RelationshipsTSV.toString
@@ -35,15 +46,11 @@ object MergeOutput {
   }
 
   def mergeFiles(headersPath:String, inputPath:String, outputPath:String) {
-    val cmd = s"cat $headersPath $inputPath > $outputPath"
-    val exitCode = cmd.!
+    //needs sh because of wildcard
+    val cmd = Seq("sh","-c",s"cat $headersPath $inputPath > $outputPath")
+    val exitCode = cmd !;
     if(exitCode != 0) throw new RuntimeException("Error merging artist nodes")
   }
-
-  def artistHeaders = "i:id discogs_id:int name:string l:label"
-  def tracklistHeaders = "i:id discogs_id:int title:string l:label"
-  def trackHeaders = "i:id title:string l:label"
-  def relationshipsHeader = "start end type"
 
   def writeToTempFile(content: String):File = {
     val tempFile = File.createTempFile("nodes","csv")
