@@ -5,6 +5,8 @@ import models.{Artist, Release, Track}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.io.Source
+
 object ProcessDiscogs {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("discogs-parser")
@@ -42,7 +44,7 @@ object ProcessDiscogs {
   }
 
   def getFavoriteArtistsNames(sc: SparkContext, file: String): RDD[String] = {
-    sc.textFile(file)
+    sc.makeRDD(Source.fromFile(file).getLines().toStream)
   }
 
   def getTracks(sc: SparkContext): RDD[Track] = {
