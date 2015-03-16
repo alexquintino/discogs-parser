@@ -7,10 +7,10 @@ import main.FileManager.Files
 
 object MergeOutput {
 
-  val ArtistHeaders = "i:id discogs_id:int name:string l:label\n"
-  val TracklistHeaders = "i:id discogs_id:int title:string l:label\n"
-  val TrackHeaders = "i:id title:string l:label\n"
-  val RelationshipsHeader = "start end type\n"
+  val ArtistHeaders = List("i:id","discogs_id:int","name:string","l:label\n").mkString("\t")
+  val TracklistHeaders = List("i:id","discogs_id:int","title:string","l:label\n").mkString("\t")
+  val TrackHeaders = List("i:id","external_id:int","title:string","l:label\n").mkString("\t")
+  val RelationshipsHeader = List("start","end","type\n").mkString("\t")
 
   def mergeAll {
     mergeArtistNodes
