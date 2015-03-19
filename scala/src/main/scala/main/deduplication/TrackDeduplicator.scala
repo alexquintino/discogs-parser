@@ -1,8 +1,8 @@
-package main
+package main.deduplication
 
 import models.Track
-import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
 
 object TrackDeduplicator {
   def deduplicate(tracks: RDD[Track]): RDD[Track] = {

@@ -1,7 +1,9 @@
-package main
+package main.graphdb
 
-import sys.process._
-import FileManager.Files._
+import main.util.FileManager
+import main.util.FileManager.Files._
+
+import scala.sys.process._
 
 object Neo4jDB {
 

@@ -1,5 +1,6 @@
 package main
 
+import main.util.Filters
 import models.{Artist, Release, Track}
 import org.apache.spark.SparkContext
 import org.scalatest._

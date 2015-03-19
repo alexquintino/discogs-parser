@@ -2,10 +2,10 @@ package models
 
 import scala.util.hashing.MurmurHash3
 
-class Track(id0: String, release: String, var artistsIds: String,  val title: String, val remixersIds: String) extends Serializable with Node {
+class Track(id0: String, releasesIds: String, artistsIds: String,  val title: String, remixersIds: String) extends Serializable with Node {
   val artists = artistsIds.split(",")
   val remixers = remixersIds.split(",")
-  val releases = Array(release)
+  val releases = releasesIds.split(",")
   var id = id0
 
   def allArtists: Array[String] = artists ++ remixers
@@ -20,8 +20,14 @@ class Track(id0: String, release: String, var artistsIds: String,  val title: St
   }
 
   def addReleases(otherReleases: Array[String]): Track = {
-    releases ++ otherReleases
-    this
+    new Track(id, (releases ++ otherReleases).mkString(","), artists.mkString(","), title, remixers.mkString(","))
+  }
+
+  override def toString: String = {
+    val releasesStr = releases.mkString(",")
+    val artistsStr = artists.mkString(",")
+    val remixersStr = remixers.mkString(",")
+    return s"$id\t$releasesStr\t$artistsStr\t$title\t$remixersStr"
   }
 
   private

@@ -1,4 +1,4 @@
-package main
+package main.util
 
 import models.{Artist, Release, Track}
 import org.apache.spark.SparkContext._

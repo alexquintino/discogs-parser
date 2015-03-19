@@ -1,5 +1,6 @@
 package main
 
+import main.util.Relationships
 import models.{Track, Artist, Release}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -81,6 +82,16 @@ class RelationshipsSpec extends FunSpec with Matchers {
     it("splits artists and moves fields around") {
       val input = (new Release("44", "master", "title", "art3,art6"), 33L)
       assert(Array(("art3","33"), ("art6", "33")).deep == Relationships.restructureRelease(input).deep)
+    }
+  }
+
+  describe("restructureTrack") {
+    it("splits the releases into several lines") {
+      val results = Relationships.restructureTrack(new Track("id","3,6,8","artist1","title",""), 44L)
+      assert(results.length == 3)
+      assert(results.contains(("3","44")))
+      assert(results.contains(("6","44")))
+      assert(results.contains(("8","44")))
     }
   }
 

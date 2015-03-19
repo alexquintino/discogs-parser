@@ -1,6 +1,6 @@
-package main
+package main.util
 
-import main.FileManager.Files
+import main.util.FileManager.Files
 import models.Node
 import org.apache.spark.rdd.RDD
 

@@ -1,9 +1,9 @@
-package main
+package main.util
 
-import models.{Track, Artist, Release}
+import main.util.FileManager._
+import models.{Artist, Release, Track}
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
-import FileManager._
 
 object Relationships {
 

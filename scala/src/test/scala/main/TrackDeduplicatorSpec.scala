@@ -1,5 +1,6 @@
 package main
 
+import main.deduplication.TrackDeduplicator
 import models.Track
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

@@ -1,9 +1,12 @@
-package main
+package main.graphdb
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import sys.process._
-import main.FileManager.Files
+
+import main.util.FileManager
+import main.util.FileManager.Files
+
+import scala.sys.process._
 
 object MergeOutput {
 
