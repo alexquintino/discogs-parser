@@ -1,8 +1,8 @@
 package models
 
-class Artist(discogsId: String, var name: String) extends Serializable with Node {
+class Artist(val id: Long, var name: String) extends Serializable with Node {
+//  val id = discogsId
   name = fixName(name)
-  var id = discogsId
 
   def normalizedName: String = {
     Artist.normalize(name)

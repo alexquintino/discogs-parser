@@ -38,7 +38,7 @@ object Relationships {
   }
 
   def extractReleasesTracksRelationships(releases: RDD[(Release, Long)], tracks: RDD[(Track, Long)]): RDD[List[Any]] = {
-    val releasesMap = releases.map { case (rel, index) => (rel.id, index.toString) }
+    val releasesMap = releases.map { case (rel, index) => (rel.id, index) }
     val tracksMap = tracks.flatMap(restructureTrack)
     releasesMap.join(tracksMap)
                 .map(extractReleaseTrackRelationship)
@@ -56,37 +56,37 @@ object Relationships {
               .map(extractRemixerTrackRelationship)
   }
 
-  def extractArtistReleaseRelationship(rel: (String, (String, String))): List[Any] = {
+  def extractArtistReleaseRelationship(rel: (Long, (Long, Long))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_TRACKLIST")
   }
 
-  def extractReleaseTrackRelationship(rel: (String, (String, String))): List[Any] = {
+  def extractReleaseTrackRelationship(rel: (Long, (Long, Long))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_TRACK")
   }
 
-  def extractArtistTrackRelationship(rel: (String, (String, String))): List[Any] = {
+  def extractArtistTrackRelationship(rel: (Long, (Long, Long))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_TRACK")
   }
 
-  def extractRemixerTrackRelationship(rel: (String, (String, String))): List[Any] = {
+  def extractRemixerTrackRelationship(rel: (Long, (Long, Long))): List[Any] = {
     List(rel._2._1, rel._2._2, "HAS_REMIX")
   }
 
-  def restructureRelease(release: (Release, Long)): Array[(String, String)] = {
-    release._1.artists.map { artist => (artist.toString, release._2.toString) }
+  def restructureRelease(release: (Release, Long)): Array[(Long, Long)] = {
+    release._1.artists.map { artist => (artist, release._2) }
   }
 
-  def restructureTrack(track: (Track, Long)): Array[(String, String)] = {
-    track._1.releases.map(releaseId => (releaseId.toString, track._2.toString))
+  def restructureTrack(track: (Track, Long)): Array[(Long, Long)] = {
+    track._1.releases.map(releaseId => (releaseId, track._2))
   }
 
-  def artistsMap(artists: RDD[(Artist, Long)]): RDD[(String, String)] = artists.map { case (artist, index) => (artist.id, index.toString) }
+  def artistsMap(artists: RDD[(Artist, Long)]): RDD[(Long, Long)] = artists.map { case (artist, index) => (artist.id, index) }
 
-  def splitArtistsInTrack(track: (Track, Long)): Array[(String, String)] = {
-    track._1.artists.map { artist => (artist.toString, track._2.toString) }
+  def splitArtistsInTrack(track: (Track, Long)): Array[(Long, Long)] = {
+    track._1.artists.map { artist => (artist, track._2) }
   }
 
-  def splitRemixersInTrack(track: (Track, Long)): Array[(String, String)] = {
-    track._1.remixers.map { artist => (artist.toString, track._2.toString) }
+  def splitRemixersInTrack(track: (Track, Long)): Array[(Long, Long)] = {
+    track._1.remixers.map { artist => (artist, track._2) }
   }
 }

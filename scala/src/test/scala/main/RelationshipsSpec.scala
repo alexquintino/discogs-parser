@@ -16,10 +16,10 @@ class RelationshipsSpec extends FunSpec with Matchers {
           val result = Relationships.extractArtistsReleasesRelationships(artists(sc), releases(sc)).collect
 
           assert(4 == result.size)
-          assert(result.contains(List("3", "97", "HAS_TRACKLIST")))
-          assert(result.contains(List("8", "12", "HAS_TRACKLIST")))
-          assert(result.contains(List("8", "97", "HAS_TRACKLIST")))
-          assert(result.contains(List("5", "10", "HAS_TRACKLIST")))
+          assert(result.contains(List(3, 97, "HAS_TRACKLIST")))
+          assert(result.contains(List(8, 12, "HAS_TRACKLIST")))
+          assert(result.contains(List(8, 97, "HAS_TRACKLIST")))
+          assert(result.contains(List(5, 10, "HAS_TRACKLIST")))
         } finally {
           sc.stop
         }
@@ -33,11 +33,11 @@ class RelationshipsSpec extends FunSpec with Matchers {
           val result = Relationships.extractReleasesTracksRelationships(releases(sc), tracks(sc)).collect
 
           assert(5 == result.size)
-          assert(result.contains(List("12", "109", "HAS_TRACK")))
-          assert(result.contains(List("108", "110", "HAS_TRACK")))
-          assert(result.contains(List("10", "111", "HAS_TRACK")))
-          assert(result.contains(List("10", "112", "HAS_TRACK")))
-          assert(result.contains(List("97", "113", "HAS_TRACK")))
+          assert(result.contains(List(12, 109, "HAS_TRACK")))
+          assert(result.contains(List(108, 110, "HAS_TRACK")))
+          assert(result.contains(List(10, 111, "HAS_TRACK")))
+          assert(result.contains(List(10, 112, "HAS_TRACK")))
+          assert(result.contains(List(97, 113, "HAS_TRACK")))
 
         } finally {
           sc.stop
@@ -50,13 +50,13 @@ class RelationshipsSpec extends FunSpec with Matchers {
         try {
           val result = Relationships.extractArtistsTracksRelationships(artists(sc), tracks(sc)).collect
           assert(7 == result.size)
-          assert(result.contains(List("3", "111", "HAS_TRACK")))
-          assert(result.contains(List("3", "113", "HAS_TRACK")))
-          assert(result.contains(List("5", "110", "HAS_TRACK")))
-          assert(result.contains(List("8", "109", "HAS_TRACK")))
-          assert(result.contains(List("9", "110", "HAS_TRACK")))
-          assert(result.contains(List("9", "112", "HAS_TRACK")))
-          assert(result.contains(List("9", "113", "HAS_TRACK")))
+          assert(result.contains(List(3, 111, "HAS_TRACK")))
+          assert(result.contains(List(3, 113, "HAS_TRACK")))
+          assert(result.contains(List(5, 110, "HAS_TRACK")))
+          assert(result.contains(List(8, 109, "HAS_TRACK")))
+          assert(result.contains(List(9, 110, "HAS_TRACK")))
+          assert(result.contains(List(9, 112, "HAS_TRACK")))
+          assert(result.contains(List(9, 113, "HAS_TRACK")))
         } finally {
           sc.stop
         }
@@ -69,8 +69,8 @@ class RelationshipsSpec extends FunSpec with Matchers {
         try {
           val result = Relationships.extractRemixersTracksRelationships(artists(sc), tracks(sc)).collect
           assert(2 == result.size)
-          assert(result.contains(List("8", "110", "HAS_REMIX")))
-          assert(result.contains(List("3", "112", "HAS_REMIX")))
+          assert(result.contains(List(8, 110, "HAS_REMIX")))
+          assert(result.contains(List(3, 112, "HAS_REMIX")))
         } finally {
           sc.stop
         }
@@ -80,54 +80,54 @@ class RelationshipsSpec extends FunSpec with Matchers {
 
   describe("restructureRelease") {
     it("splits artists and moves fields around") {
-      val input = (new Release("44", "master", "title", Array(3,6)), 33L)
-      assert(Array(("3","33"), ("6", "33")).deep == Relationships.restructureRelease(input).deep)
+      val input = (new Release(44, "master", "title", Array(3,6)), 33L)
+      assert(Array((3,33), (6, 33)).deep == Relationships.restructureRelease(input).deep)
     }
   }
 
   describe("restructureTrack") {
     it("splits the releases into several lines") {
-      val results = Relationships.restructureTrack(new Track("id",Array(3,6,8),Array(1),"title",Array()), 44L)
+      val results = Relationships.restructureTrack(new Track(1,Array(3,6,8),Array(1),"title",Array()), 44L)
       assert(results.length == 3)
-      assert(results.contains(("3","44")))
-      assert(results.contains(("6","44")))
-      assert(results.contains(("8","44")))
+      assert(results.contains((3,44)))
+      assert(results.contains((6,44)))
+      assert(results.contains((8,44)))
     }
   }
 
   describe("extractArtistReleaseRelationship") {
     it("returns the correct structure") {
-      val input = ("art6", ("art6", "9"))
-      assert(List("art6", "9", "HAS_TRACKLIST") == Relationships.extractArtistReleaseRelationship(input))
+      val input = (6L, (6L, 8L))
+      assert(List(6, 8, "HAS_TRACKLIST") == Relationships.extractArtistReleaseRelationship(input))
     }
   }
 
 
   def artists(sc:SparkContext): RDD[(Artist, Long)] = {
     sc.parallelize(List(
-      (new Artist("3","name"), 3L),
-      (new Artist("5","name"), 5L),
-      (new Artist("8","name"), 8L),
-      (new Artist("9","name"), 9L)
+      (new Artist(3,"name"), 3L),
+      (new Artist(5,"name"), 5L),
+      (new Artist(8,"name"), 8L),
+      (new Artist(9,"name"), 9L)
     ))
   }
 
   def releases(sc:SparkContext): RDD[(Release, Long)] = {
     sc.parallelize(List(
-      (new Release("1","masterRel","title",Array(5)), 10L),
-      (new Release("3","masterRel","title",Array(8)), 12L),
-      (new Release("88","masterRel","title",Array(3,8)), 97L),
-      (new Release("99","masterRel","title",Array(4)), 108L)
+      (new Release(1,"masterRel","title",Array(5)), 10L),
+      (new Release(3,"masterRel","title",Array(8)), 12L),
+      (new Release(88,"masterRel","title",Array(3,8)), 97L),
+      (new Release(99,"masterRel","title",Array(4)), 108L)
     ))
   }
 
   def tracks(sc:SparkContext): RDD[(Track, Long)] = {
     sc.parallelize(List(
-      (new Track("1",Array(3),Array(8),"title1",Array()), 109L),
-      (new Track("2",Array(99),Array(5,9),"title2",Array(8)), 110L),
-      (new Track("3",Array(1),Array(3),"title3",Array()), 111L),
-      (new Track("4",Array(1),Array(9),"title4",Array(3)), 112L),
-      (new Track("5",Array(88),Array(9,3),"title5",Array()), 113L)
+      (new Track(1,Array(3),Array(8),"title1",Array()), 109L),
+      (new Track(2,Array(99),Array(5,9),"title2",Array(8)), 110L),
+      (new Track(3,Array(1),Array(3),"title3",Array()), 111L),
+      (new Track(4,Array(1),Array(9),"title4",Array(3)), 112L),
+      (new Track(5,Array(88),Array(9,3),"title5",Array()), 113L)
     ))
   }
 }

@@ -10,7 +10,7 @@ object DiscogsData {
   def artists(sc: SparkContext): RDD[Artist] = {
     sc.textFile(Files.DiscogsArtists.toString)
       .map(_.split("\t"))
-      .map { case fields:Array[String] => new Artist(fields(0), fields(1)) }
+      .map { case fields:Array[String] => new Artist(fields(0).toLong, fields(1)) }
   }
 
   def releases(sc:SparkContext): RDD[Release] = {
@@ -20,7 +20,7 @@ object DiscogsData {
       .map {
       fields =>
         val artists = fields(3).split(",").map(_.toLong)
-        new Release(fields(0), fields(1), fields(2), artists)
+        new Release(fields(0).toLong, fields(1), fields(2), artists)
     }
   }
 
@@ -34,7 +34,7 @@ object DiscogsData {
           val releases = Array(fields(0).toLong)
           val artists = fields(1).split(",").map(_.toLong)
           val remixers = if(fields.size == 3) Array[Long]() else tryFetchingRemixers(fields(3))
-          new Track(index.toString, releases, artists, fields(2), remixers)
+          new Track(index, releases, artists, fields(2), remixers)
       }
   }
 
@@ -46,7 +46,7 @@ object DiscogsData {
         val releases = fields(1).split(",").map(_.toLong)
         val artists = fields(2).split(",").map(_.toLong)
         val remixers = if(fields.size == 4) Array[Long]() else tryFetchingRemixers(fields(4))
-        new Track(fields(0), releases, artists, fields(3), remixers)
+        new Track(fields(0).toLong, releases, artists, fields(3), remixers)
     }
   }
 

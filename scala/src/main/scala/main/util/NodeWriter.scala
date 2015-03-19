@@ -15,7 +15,7 @@ object NodeWriter {
 
   def addIndex[T <: Node](nodes: RDD[T]): RDD[(T, Long)] = {
     val index = lastIndex
-    val withIndex = nodes.map { case node => (node, node.id.toLong + index) }
+    val withIndex = nodes.map { case node => (node, node.id + index) }
     lastIndex = withIndex.map(_._2).max
     withIndex
   }

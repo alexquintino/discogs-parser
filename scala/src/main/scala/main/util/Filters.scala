@@ -7,7 +7,7 @@ import org.apache.spark.rdd.RDD
 object Filters {
   def filterTracksBasedOnReleases(tracks: RDD[Track], releases: RDD[Release]): RDD[Track] = {
     val relsIds = releases.map(_.id).collect.toSet
-    tracks.filter(t => contains(t.releases.map(_.toString), relsIds))
+    tracks.filter(t => contains(t.releases, relsIds))
   }
 
   def filterReleasesBasedOnTracks(releases: RDD[Release], tracks: RDD[Track]): RDD[Release] = {
@@ -21,7 +21,7 @@ object Filters {
   }
 
   def filterTracksBasedOnArtists(tracks: RDD[Track], artists: RDD[Artist]): RDD[Track] = {
-    val artistsIds = artists.map(_.id).collect().toSet[String]
+    val artistsIds = artists.map(_.id).collect().toSet[Long]
     tracks.filter(track => contains(track.allArtists, artistsIds))
   }
 
@@ -34,7 +34,7 @@ object Filters {
   }
 
   // checks if there's any of the values in a Set. Then reduces it to a single true/false
-  def contains(values: Array[String], list: Set[String]): Boolean = {
+  def contains(values: Array[Long], list: Set[Long]): Boolean = {
     values.map(id => list.contains(id)).fold(false)((bool, res) => bool || res)
   }
 

@@ -1,6 +1,6 @@
 package models
 
 trait Node {
-  var id: String
+  val id: Long
   def asNode: String
 }

@@ -2,17 +2,16 @@ package models
 
 import scala.util.hashing.MurmurHash3
 
-class Track(id0: String, val releases: Array[Long], val artists: Array[Long],  val title: String, val remixers: Array[Long]) extends Serializable with Node {
-  var id = id0
+class Track(val id: Long, val releases: Array[Long], val artists: Array[Long],  val title: String, val remixers: Array[Long]) extends Serializable with Node {
 
-  def allArtists: Array[String] = (artists ++ remixers).map(_.toString)
+  def allArtists: Array[Long] = (artists ++ remixers)
 
   def asNode: String = List(id, title, "Track").mkString("\t")
 
   def hasRemixers: Boolean = !remixers.isEmpty
 
   def hash: Int = {
-    val fields = allArtists.sorted(Ordering.String) ++ normalizedTitle
+    val fields = allArtists.sorted(Ordering.Long) ++ normalizedTitle
     MurmurHash3.arrayHash(fields)
   }
 

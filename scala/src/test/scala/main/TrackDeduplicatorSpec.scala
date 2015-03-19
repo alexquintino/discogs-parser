@@ -15,9 +15,9 @@ class TrackDeduplicatorSpec extends FunSpec with Matchers{
         val dedupTracks = TrackDeduplicator.deduplicate(tracks(sc)).collect().toList.map(_.id)
 
         assert(dedupTracks.length == 3)
-        assert(dedupTracks.contains("id1"))
-        assert(dedupTracks.contains("id2"))
-        assert(dedupTracks.contains("id4"))
+        assert(dedupTracks.contains(1))
+        assert(dedupTracks.contains(2))
+        assert(dedupTracks.contains(4))
       } finally {
         sc.stop()
       }
@@ -26,11 +26,11 @@ class TrackDeduplicatorSpec extends FunSpec with Matchers{
 
   def tracks(sc:SparkContext): RDD[Track] = {
     sc.parallelize(List(
-      new Track("id1",Array(1),Array(8),"title1",Array()),
-      new Track("id2",Array(2),Array(5,9),"title2",Array(8)),
-      new Track("id3",Array(3),Array(8),"title1",Array()),
-      new Track("id4",Array(4),Array(5),"title3",Array(3)),
-      new Track("id5",Array(5),Array(5,9),"TitLe2",Array(8))
+      new Track(1,Array(1),Array(8),"title1",Array()),
+      new Track(2,Array(2),Array(5,9),"title2",Array(8)),
+      new Track(3,Array(3),Array(8),"title1",Array()),
+      new Track(4,Array(4),Array(5),"title3",Array(3)),
+      new Track(5,Array(5),Array(5,9),"TitLe2",Array(8))
     ))
   }
 }

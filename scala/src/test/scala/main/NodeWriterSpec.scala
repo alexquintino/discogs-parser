@@ -42,9 +42,9 @@ class NodeWriterSpec extends FunSpec with Matchers {
 
   def nodes(sc: SparkContext): RDD[Artist] = {
     sc.parallelize(List(
-      new Artist("1","Artist1"),
-      new Artist("2","Artist2"),
-      new Artist("3","Artist3")
+      new Artist(1,"Artist1"),
+      new Artist(2,"Artist2"),
+      new Artist(3,"Artist3")
     ))
   }
 }
