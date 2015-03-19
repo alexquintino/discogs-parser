@@ -73,7 +73,7 @@ object Relationships {
   }
 
   def restructureRelease(release: (Release, Long)): Array[(String, String)] = {
-    release._1.artists.map { artist => (artist, release._2.toString) }
+    release._1.artists.map { artist => (artist.toString, release._2.toString) }
   }
 
   def restructureTrack(track: (Track, Long)): Array[(String, String)] = {

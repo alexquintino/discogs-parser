@@ -17,7 +17,11 @@ object DiscogsData {
     sc.textFile(Files.DiscogsReleases.toString)
       .map(_.split("\t"))
       .filter(_.size == 4)
-      .map(fields => new Release(fields(0), fields(1), fields(2), fields(3)))
+      .map {
+      fields =>
+        val artists = fields(3).split(",").map(_.toLong)
+        new Release(fields(0), fields(1), fields(2), artists)
+    }
   }
 
   def tracks(sc: SparkContext): RDD[Track] = {
@@ -26,12 +30,12 @@ object DiscogsData {
       .filter(_.size > 2)
       .zipWithIndex()
       .map {
-      case (fields, index) =>
-        val releases = Array(fields(0).toLong)
-        val artists = fields(1).split(",").map(_.toLong)
-        val remixers = if(fields.length == 3) Array[Long]() else fields(3).split(",").map(_.toLong)
-        new Track(index.toString, releases, artists, fields(2), remixers)
-    }
+        case (fields, index) =>
+          val releases = Array(fields(0).toLong)
+          val artists = fields(1).split(",").map(_.toLong)
+          val remixers = if(fields.size == 3) Array[Long]() else tryFetchingRemixers(fields(3))
+          new Track(index.toString, releases, artists, fields(2), remixers)
+      }
   }
 
   def dedupTracks(sc: SparkContext): RDD[Track] = {
@@ -41,8 +45,17 @@ object DiscogsData {
       case fields =>
         val releases = fields(1).split(",").map(_.toLong)
         val artists = fields(2).split(",").map(_.toLong)
-        val remixers = if(fields.length == 4) Array[Long]() else fields(4).split(",").map(_.toLong)
+        val remixers = if(fields.size == 4) Array[Long]() else tryFetchingRemixers(fields(4))
         new Track(fields(0), releases, artists, fields(3), remixers)
+    }
+  }
+
+  private
+  def tryFetchingRemixers(field: String): Array[Long] = {
+    try {
+      return field.split(",").map(_.toLong)
+    } catch {
+      case e:java.lang.NumberFormatException => return Array()
     }
   }
 }

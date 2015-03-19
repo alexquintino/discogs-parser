@@ -80,8 +80,8 @@ class RelationshipsSpec extends FunSpec with Matchers {
 
   describe("restructureRelease") {
     it("splits artists and moves fields around") {
-      val input = (new Release("44", "master", "title", "art3,art6"), 33L)
-      assert(Array(("art3","33"), ("art6", "33")).deep == Relationships.restructureRelease(input).deep)
+      val input = (new Release("44", "master", "title", Array(3,6)), 33L)
+      assert(Array(("3","33"), ("6", "33")).deep == Relationships.restructureRelease(input).deep)
     }
   }
 
@@ -114,10 +114,10 @@ class RelationshipsSpec extends FunSpec with Matchers {
 
   def releases(sc:SparkContext): RDD[(Release, Long)] = {
     sc.parallelize(List(
-      (new Release("1","masterRel","title","5"), 10L),
-      (new Release("3","masterRel","title","8"), 12L),
-      (new Release("88","masterRel","title","3,8"), 97L),
-      (new Release("99","masterRel","title","4"), 108L)
+      (new Release("1","masterRel","title",Array(5)), 10L),
+      (new Release("3","masterRel","title",Array(8)), 12L),
+      (new Release("88","masterRel","title",Array(3,8)), 97L),
+      (new Release("99","masterRel","title",Array(4)), 108L)
     ))
   }
 

@@ -94,8 +94,8 @@ class FiltersSpec extends FunSpec with Matchers {
 
   describe("oldestRelease") {
     it("returns the oldestRelease correctly") {
-      val release1 = new Release("99", "33", "Release1", "3")
-      val release2 = new Release("999", "33", "Release1", "3")
+      val release1 = new Release("99", "33", "Release1", Array(3))
+      val release2 = new Release("999", "33", "Release1", Array(3))
       assert(Filters.oldestRelease(release1, release2) == release1)
     }
   }
@@ -119,13 +119,13 @@ class FiltersSpec extends FunSpec with Matchers {
 
   def releases(sc:SparkContext) = {
     sc.parallelize(List(
-      new Release("1", "33", "Title1", "2,3"),
-      new Release("2", "44", "Title2", "4"),
-      new Release("3", "55", "Title3", "1"),
-      new Release("4", "33", "Title1", "2,3"),
-      new Release("5", "66", "Title5", "10,11"),
-      new Release("8", "66", "Title5", "10,11"),
-      new Release("10", "", "Title10", "4")
+      new Release("1", "33", "Title1", Array(2,3)),
+      new Release("2", "44", "Title2", Array(4)),
+      new Release("3", "55", "Title3", Array(1)),
+      new Release("4", "33", "Title1", Array(2,3)),
+      new Release("5", "66", "Title5", Array(10,11)),
+      new Release("8", "66", "Title5", Array(10,11)),
+      new Release("10", "", "Title10", Array(4))
     ))
   }
 
