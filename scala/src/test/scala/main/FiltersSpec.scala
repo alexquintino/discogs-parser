@@ -25,7 +25,7 @@ class FiltersSpec extends FunSpec with Matchers {
       val result = Filters.filterTracksBasedOnArtists(tracks(sc), favArtists).collect()
 
       assert(result.length == 3)
-      assert(result.flatMap(_.releases).deep == Array("5", "8", "10").deep)
+      assert(result.flatMap(_.releases).deep == Array(5, 8, 10).deep)
     } finally {
       sc.stop()
     }
@@ -66,7 +66,7 @@ class FiltersSpec extends FunSpec with Matchers {
       val result = Filters.filterTracksBasedOnReleases(tracks(sc), selectedReleases).collect()
 
       assert(result.length == 2)
-      assert(result.flatMap(_.releases).deep == Array("2", "8").deep)
+      assert(result.flatMap(_.releases).deep == Array(2, 8).deep)
       assert(result.map(_.title).deep == Array("Some name", "Some other other name").deep)
     } finally {
       sc.stop()
@@ -110,11 +110,11 @@ class FiltersSpec extends FunSpec with Matchers {
 
   def tracks(sc:SparkContext) = {
     sc.parallelize( List(
-      new Track("1","0","1","Some", ""),
-      new Track("2","2","3","Some name", "44"),
-      new Track("3","5","6","Some other name", "4"),
-      new Track("4","8","2","Some other other name", "10,11"),
-      new Track("5","10","4","Some other other other name", "")))
+      new Track("1",Array(0),Array(1),"Some", Array()),
+      new Track("2",Array(2),Array(3),"Some name", Array(44)),
+      new Track("3",Array(5),Array(6),"Some other name", Array(4)),
+      new Track("4",Array(8),Array(2),"Some other other name", Array(10,11)),
+      new Track("5",Array(10),Array(4),"Some other other other name", Array())))
   }
 
   def releases(sc:SparkContext) = {

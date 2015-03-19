@@ -64,7 +64,7 @@ class RelationshipsSpec extends FunSpec with Matchers {
     }
 
     describe("extractRemixersTracksRelationships") {
-      it("joins the reixers with tracks and extracts the relationships") {
+      it("joins the remixers with tracks and extracts the relationships") {
         val sc = SparkUtil.context()
         try {
           val result = Relationships.extractRemixersTracksRelationships(artists(sc), tracks(sc)).collect
@@ -87,7 +87,7 @@ class RelationshipsSpec extends FunSpec with Matchers {
 
   describe("restructureTrack") {
     it("splits the releases into several lines") {
-      val results = Relationships.restructureTrack(new Track("id","3,6,8","artist1","title",""), 44L)
+      val results = Relationships.restructureTrack(new Track("id",Array(3,6,8),Array(1),"title",Array()), 44L)
       assert(results.length == 3)
       assert(results.contains(("3","44")))
       assert(results.contains(("6","44")))
@@ -105,29 +105,29 @@ class RelationshipsSpec extends FunSpec with Matchers {
 
   def artists(sc:SparkContext): RDD[(Artist, Long)] = {
     sc.parallelize(List(
-      (new Artist("art3","name"), 3L),
-      (new Artist("art5","name"), 5L),
-      (new Artist("art8","name"), 8L),
-      (new Artist("art9","name"), 9L)
+      (new Artist("3","name"), 3L),
+      (new Artist("5","name"), 5L),
+      (new Artist("8","name"), 8L),
+      (new Artist("9","name"), 9L)
     ))
   }
 
   def releases(sc:SparkContext): RDD[(Release, Long)] = {
     sc.parallelize(List(
-      (new Release("1","masterRel","title","art5"), 10L),
-      (new Release("3","masterRel","title","art8"), 12L),
-      (new Release("88","masterRel","title","art3,art8"), 97L),
-      (new Release("99","masterRel","title","art4"), 108L)
+      (new Release("1","masterRel","title","5"), 10L),
+      (new Release("3","masterRel","title","8"), 12L),
+      (new Release("88","masterRel","title","3,8"), 97L),
+      (new Release("99","masterRel","title","4"), 108L)
     ))
   }
 
   def tracks(sc:SparkContext): RDD[(Track, Long)] = {
     sc.parallelize(List(
-      (new Track("1","3","art8","title1",""), 109L),
-      (new Track("2","99","art5,art9","title2","art8"), 110L),
-      (new Track("3","1","art3","title3",""), 111L),
-      (new Track("4","1","art9","title4","art3"), 112L),
-      (new Track("5","88","art9,art3","title5",""), 113L)
+      (new Track("1",Array(3),Array(8),"title1",Array()), 109L),
+      (new Track("2",Array(99),Array(5,9),"title2",Array(8)), 110L),
+      (new Track("3",Array(1),Array(3),"title3",Array()), 111L),
+      (new Track("4",Array(1),Array(9),"title4",Array(3)), 112L),
+      (new Track("5",Array(88),Array(9,3),"title5",Array()), 113L)
     ))
   }
 }

@@ -77,16 +77,16 @@ object Relationships {
   }
 
   def restructureTrack(track: (Track, Long)): Array[(String, String)] = {
-    track._1.releases.map(releaseId => (releaseId, track._2.toString))
+    track._1.releases.map(releaseId => (releaseId.toString, track._2.toString))
   }
 
   def artistsMap(artists: RDD[(Artist, Long)]): RDD[(String, String)] = artists.map { case (artist, index) => (artist.id, index.toString) }
 
   def splitArtistsInTrack(track: (Track, Long)): Array[(String, String)] = {
-    track._1.artists.map { artist => (artist, track._2.toString) }
+    track._1.artists.map { artist => (artist.toString, track._2.toString) }
   }
 
   def splitRemixersInTrack(track: (Track, Long)): Array[(String, String)] = {
-    track._1.remixers.map { artist => (artist, track._2.toString) }
+    track._1.remixers.map { artist => (artist.toString, track._2.toString) }
   }
 }

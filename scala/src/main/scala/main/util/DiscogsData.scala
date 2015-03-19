@@ -26,10 +26,11 @@ object DiscogsData {
       .filter(_.size > 2)
       .zipWithIndex()
       .map {
-      case (fields, index) => if (fields.length == 3)
-        new Track(index.toString, fields(0), fields(1), fields(2), "")
-      else
-        new Track(index.toString, fields(0), fields(1), fields(2), fields(3))
+      case (fields, index) =>
+        val releases = Array(fields(0).toLong)
+        val artists = fields(1).split(",").map(_.toLong)
+        val remixers = if(fields.length == 3) Array[Long]() else fields(3).split(",").map(_.toLong)
+        new Track(index.toString, releases, artists, fields(2), remixers)
     }
   }
 
@@ -37,10 +38,11 @@ object DiscogsData {
     sc.textFile(Files.DiscogsTracksDeduplicated.toString)
       .map(_.split("\t"))
       .map {
-      case fields => if (fields.length == 4)
-        new Track(fields(0), fields(1), fields(2), fields(3), "")
-      else
-        new Track(fields(0), fields(1), fields(2), fields(3), fields(4))
+      case fields =>
+        val releases = fields(1).split(",").map(_.toLong)
+        val artists = fields(2).split(",").map(_.toLong)
+        val remixers = if(fields.length == 4) Array[Long]() else fields(4).split(",").map(_.toLong)
+        new Track(fields(0), releases, artists, fields(3), remixers)
     }
   }
 }
