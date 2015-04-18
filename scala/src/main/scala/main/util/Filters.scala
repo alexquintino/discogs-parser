@@ -17,7 +17,7 @@ object Filters {
 
   def favoriteArtists(artists: RDD[Artist], favoriteArtistsNames: RDD[String]): RDD[Artist] = {
     val favoriteArtistsNamesWithNorm = favoriteArtistsNames.map(name => (Artist.normalize(name), name)) // (norm, name)
-    favoriteArtistsNamesWithNorm.join(artists.map(artist => (artist.normalizedName, artist))).map(_._2._2)
+    favoriteArtistsNamesWithNorm.join(artists.map(artist => (artist.normalizedName, artist))).map(_._2._2).distinct()
   }
 
   def filterTracksBasedOnArtists(tracks: RDD[Track], artists: RDD[Artist]): RDD[Track] = {

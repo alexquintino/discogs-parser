@@ -34,7 +34,8 @@ object DiscogsData {
           val releases = Array(fields(0).toLong)
           val artists = fields(1).split(",").map(_.toLong)
           val remixers = if(fields.size == 3) Array[Long]() else tryFetchingRemixers(fields(3))
-          new Track(index, releases, artists, fields(2), remixers)
+          val title = if(remixers.isEmpty) fields.slice(2,fields.size).mkString(" ") else fields(2)
+          new Track(index, releases, artists, title, remixers)
       }
   }
 

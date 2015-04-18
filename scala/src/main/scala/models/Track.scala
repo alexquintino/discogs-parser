@@ -1,12 +1,13 @@
 package models
 
+import main.util.Normalizer
 import scala.util.hashing.MurmurHash3
 
 class Track(val id: Long, val releases: Array[Long], val artists: Array[Long],  val title: String, val remixers: Array[Long]) extends Serializable with Node {
 
   def allArtists: Array[Long] = (artists ++ remixers)
 
-  def asNode: String = List(id, title, "Track").mkString("\t")
+  def asNode: String = List(id, title, normalizedTitle, "Track").mkString("\t")
 
   def hasRemixers: Boolean = !remixers.isEmpty
 
@@ -27,6 +28,6 @@ class Track(val id: Long, val releases: Array[Long], val artists: Array[Long],  
   }
 
   private
-  def normalizedTitle:String = title.toLowerCase()
+  def normalizedTitle = Normalizer.normalize(title)
 
 }

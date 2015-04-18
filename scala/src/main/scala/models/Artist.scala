@@ -1,5 +1,7 @@
 package models
 
+import main.util.Normalizer
+
 class Artist(val id: Long, var name: String) extends Serializable with Node {
 //  val id = discogsId
   name = fixName(name)
@@ -26,12 +28,28 @@ class Artist(val id: Long, var name: String) extends Serializable with Node {
     return (name_without_number, number)
   }
 
-  def asNode: String = List(id, name, "Artist").mkString("\t")
+  def asNode: String = List(id, name, Normalizer.normalize(name), "Artist").mkString("\t")
+
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Artist]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Artist =>
+      (that canEqual this) &&
+        id == that.id &&
+        normalizedName == that.normalizedName
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(id, name)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
 }
 
 object Artist {
 
   def normalize(name: String): String = {
-    name.toLowerCase
+    Normalizer.normalize(name)
   }
 }

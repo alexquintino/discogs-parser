@@ -6,13 +6,13 @@ import org.apache.spark.SparkContext
 import org.scalatest._
 
 class FiltersSpec extends FunSpec with Matchers {
-  it("filters out favorite artists") {
+  it("filters out favorite artists without duplicates") {
     val sc = SparkUtil.context()
     try {
-      val result = Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc)).collect()
+      val result = Filters.favoriteArtists(artists(sc), favoriteArtistsNames(sc)).collect().map(artist => (artist.name, artist.id))
       assert(result.length == 2)
-      assert(result.head.name == "Artist 2")
-      assert(result.last.name == "Artist 4")
+      assert(result.contains("Artist 2",2))
+      assert(result.contains("Artist 4",4))
     } finally {
       sc.stop()
     }
@@ -130,6 +130,6 @@ class FiltersSpec extends FunSpec with Matchers {
   }
 
   def favoriteArtistsNames(sc:SparkContext) = {
-    sc.parallelize(List("artist 2", "Artist 4"))
+    sc.parallelize(List("artist 2", "Artist 4", "Artist    4"))
   }
 }

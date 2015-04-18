@@ -15,9 +15,7 @@ object FileManager {
     val DiscogsArtists = Value(s"$dataPath/data/discogs_artists.tsv")
     val DiscogsReleases = Value(s"$dataPath/data/discogs_releases.tsv")
     val DiscogsTracks = Value(s"$dataPath/data/discogs_tracks.tsv")
-    val DiscogsTracksDeduplicated = Value(s"$dataPath/data/discogs_tracks_deduplicated.tsv")
-
-    val tracksDeduplicated = Value(s"$dataPath/output/tracks_deduplicated")
+    val DiscogsTracksDeduplicated = Value(s"$dataPath/data/discogs_tracks_deduplicated")
 
     val ArtistTracksRelationship = Value(s"$dataPath/output/artist_track_relationships")
     val ArtistReleaseRelationship = Value(s"$dataPath/output/artist_release_relationships")

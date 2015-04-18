@@ -10,9 +10,9 @@ import scala.sys.process._
 
 object MergeOutput {
 
-  val ArtistHeaders = List("i:id","discogs_id:int","name:string","l:label\n").mkString("\t")
-  val TracklistHeaders = List("i:id","discogs_id:int","title:string","l:label\n").mkString("\t")
-  val TrackHeaders = List("i:id","external_id:int","title:string","l:label\n").mkString("\t")
+  val ArtistHeaders = List("i:id","discogs_id:int","name:string", "normalized:string","l:label\n").mkString("\t")
+  val TracklistHeaders = List("i:id","discogs_id:int","title:string","normalized:string","l:label\n").mkString("\t")
+  val TrackHeaders = List("i:id","external_id:int","title:string","normalized:string","l:label\n").mkString("\t")
   val RelationshipsHeader = List("start","end","type\n").mkString("\t")
 
   def mergeAll {

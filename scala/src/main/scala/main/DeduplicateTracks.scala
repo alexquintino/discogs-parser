@@ -14,7 +14,7 @@ object DeduplicateTracks {
     val sc = new SparkContext(conf)
 
     val deduplicatedTracks = TrackDeduplicator.deduplicate(DiscogsData.tracks(sc))
-    deduplicatedTracks.saveAsTextFile(Files.tracksDeduplicated.toString)
+    deduplicatedTracks.saveAsTextFile(Files.DiscogsTracksDeduplicated.toString)
   }
 
 
