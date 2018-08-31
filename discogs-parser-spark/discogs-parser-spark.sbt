@@ -1,4 +1,4 @@
-name := "discogs-parser"
+name := "discogs-parser-spark"
 
 version := "1.0"
 
